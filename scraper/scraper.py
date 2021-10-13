@@ -4,11 +4,6 @@ from datetime import datetime
 import json
 import pandas as pd
 
-def get_permit_ids():
-    # return dict with trip in form of permit ID and division ID (no clue what that is)
-    return 
-
-
 class Requester():
     def __init__(self):
         # need to pull a sneaky by pretending I am an actual computer
@@ -37,9 +32,8 @@ class Requester():
 
 if __name__ == '__main__':
     r = Requester()
-    permit_ids = get_permit_ids()
-    start_date, end_date = datetime(2021, 10, 12), datetime(2021, 12, 12)
-    request_df = r.api_request("middle_fork", (start_date, end_date))
+    date_range = datetime(2021, 10, 12), datetime(2021, 12, 12)
+    request_df = r.api_request("middle_fork", date_range)
     print(request_df)
 
 
