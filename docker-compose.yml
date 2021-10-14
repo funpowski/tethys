@@ -1,0 +1,15 @@
+version: "3"
+services:
+  scraper:
+    container_name: scraper
+    build:
+      context: .
+      dockerfile: ./scraper/Dockerfile
+    tty: true
+    networks: 
+      - tethys-net
+    command: ["bin/bash"]
+
+networks:
+  tethys-net:
+    name: tethys-net
