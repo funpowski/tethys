@@ -10,6 +10,16 @@ services:
       - tethys-net
     command: ["bin/bash"]
 
+  db:
+    container_name: db
+    build:
+      context: .
+      dockerfile: ./db/Dockerfile
+    tty: true
+    networks: 
+      - tethys-net
+    command: ["bin/bash"]
+
 networks:
   tethys-net:
     name: tethys-net

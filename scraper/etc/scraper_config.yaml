@@ -1,0 +1,13 @@
+dates:
+  start_date: 2021-10-12T06:00:00.000Z
+  end_date: 2021-12-12T06:00:00.000Z
+headers:
+  User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36
+permits:
+  middle_fork:
+    permit_id: 234623
+    division_id: 377
+  deso_gray:
+    permit_id: 233393
+    division_id: 282
+
