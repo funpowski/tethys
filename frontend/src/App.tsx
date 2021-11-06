@@ -4,6 +4,8 @@ import Helmet from "react-helmet"
 
 import Header from './components/Header'
 import Sidebar from './components/Sidebar'
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
 
 const smVariant = { navigation: 'drawer', navigationButton: true }
 const mdVariant = { navigation: 'sidebar', navigationButton: false }
