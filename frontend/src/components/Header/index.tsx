@@ -2,7 +2,7 @@ import { Box, Center, IconButton, Text, Flex } from '@chakra-ui/react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react"
 import { ChevronRightIcon } from '@chakra-ui/icons'
 
-import PermitMap from '../../components/Map'
+import Map from '../../components/Map'
 import RangePicker from '../../components/Calendar'
 
 interface Props {
@@ -19,11 +19,13 @@ const Header = ({ showSidebarButton = true, onShowSidebar }: Props) => {
       </TabList>
       <TabPanels>
         <TabPanel>
-          <RangePicker />
+          <Center>
+            <RangePicker />
+          </Center>
         </TabPanel>
         <TabPanel>
           <Box>
-            <PermitMap />
+            <Map />
           </Box>
         </TabPanel>
       </TabPanels>

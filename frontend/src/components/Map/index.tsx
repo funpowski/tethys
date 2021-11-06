@@ -1,9 +1,9 @@
 import { MapContainer, TileLayer } from "react-leaflet";
+import { Component } from 'react'
 
-const Map = () => {
-
-  return (
-    <div className="map__container">
+class Map extends Component{
+  render(){
+      return (
       <MapContainer
         style={{ width: "100%", height: "50vh" }}
         center={[48.864716, 2.349]}
@@ -14,10 +14,9 @@ const Map = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-      console.log(this.map)
       </MapContainer>
-    </div>
-  );
-};
+    )
+  }
+}
 
 export default Map
