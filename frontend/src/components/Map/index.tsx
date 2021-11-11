@@ -1,11 +1,29 @@
 import { MapContainer, TileLayer } from "react-leaflet";
-import { Component } from 'react'
+import React, { Component } from 'react'
 
-class Map extends Component{
+// good info on adding markers
+// https://stackoverflow.com/questions/62182987/is-the-react-way-really-to-re-render-the-whole-react-leaflet-component-regular
+
+class Map extends Component<any, any>{
+  constructor(props) {
+    super(props);
+    this.state = {invalidate:false}
+  }
+
+
+  componentDidUpdate(prevProps) {
+    if(this.props.invalidate !== prevProps.invalidate) // Check if it's a new user, you can also use some unique property, like the ID  (this.props.user.id !== prevProps.user.id)
+    {
+      this.setState({invalidate:true})
+      console.log(this)
+    }
+  }
+
   render(){
       return (
       <MapContainer
-        style={{ width: "100%", height: "50vh" }}
+        key={this.state.invalidate}
+        style={{ height: "50vh" }}
         center={[48.864716, 2.349]}
         zoom={13}
       >

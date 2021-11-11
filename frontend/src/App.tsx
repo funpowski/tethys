@@ -33,10 +33,7 @@ export default function App() {
         onClose={toggleSidebar}
       />
       <Box ml={!variants?.navigationButton && 200}>
-        <Header
-          showSidebarButton={variants?.navigationButton}
-          onShowSidebar={toggleSidebar}
-        />
+        <Header />
       </Box>
     </>
   )
