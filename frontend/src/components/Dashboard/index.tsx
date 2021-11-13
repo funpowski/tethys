@@ -1,6 +1,5 @@
-import { Box, Center, VStack } from '@chakra-ui/react'
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react"
-import { createRef, Component } from 'react'
+import { Box, } from '@chakra-ui/react'
+import { Component } from 'react'
 
 import Map from '../../components/Map'
 import RangePicker from '../../components/Calendar'

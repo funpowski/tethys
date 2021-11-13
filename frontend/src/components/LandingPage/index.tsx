@@ -1,4 +1,4 @@
-import { Box, Center, VStack, Container, Text } from '@chakra-ui/react'
+import { Box, Center, Text } from '@chakra-ui/react'
 import { Component } from 'react'
 
 // good notes about why any is required https://stackoverflow.com/a/47562985/13354634

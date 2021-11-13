@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Box, useBreakpointValue, Flex, Spacer, Center, Square, Text, HStack, Grid, GridItem } from '@chakra-ui/react'
+import { Flex, Center, Square, } from '@chakra-ui/react'
 import Helmet from "react-helmet"
 
 import Dashboard from './components/Dashboard'
@@ -7,15 +6,7 @@ import Sidebar from './components/Sidebar'
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 
-const smVariant = { navigation: 'drawer', navigationButton: true }
-const mdVariant = { navigation: 'sidebar', navigationButton: false }
-
 export default function App() {
-  const [isSidebarOpen, setSidebarOpen] = useState(false)
-  const variants = useBreakpointValue({ base: smVariant, md: mdVariant })
-
-  const toggleSidebar = () => setSidebarOpen(!isSidebarOpen)
-
   return (
     <>
       <Helmet>
