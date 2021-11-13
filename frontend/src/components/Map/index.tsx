@@ -11,8 +11,8 @@ class Map extends Component<any, any>{
     super(props);
     this.state = {
       invalidate:false,  // use this to toggle map rerender on tab click
-      lat:1,
-      lon:2,
+      lat:0,
+      lon:0,
       city:null,
       regionName:null,
       zoom:8,
@@ -33,24 +33,25 @@ class Map extends Component<any, any>{
       city:data.city,
       regionName: data.regionName
     })
+
+    // then, update based on user location by searching for location in OSM
+    const query = `${this.state.city}, ${this.state.regionName}`;
+    const results = await this.state.provider.search({ query: query });
+    if(results.length > 0){
+      const location = results[1];
+      this.setState({
+        lat:location.x,
+        lon:location.y,
+      })
+    }
   }
 
-  async componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps) {
     if(this.props.invalidate !== prevProps.invalidate) // Check if it's a new user, you can also use some unique property, like the ID  (this.props.user.id !== prevProps.user.id)
     {
-      // first, update based on user location by searching for location in OSM
-      const query = `${this.state.city}, ${this.state.regionName}`;
-      const results = await this.state.provider.search({ query: query });
-      if(results.length > 0){
-        const location = results[1];
-        this.setState({
-          lat:location.x,
-          lon:location.y,
-        })
-
-      // then invalidate map
+      // invalidate map on update to reflect button click
       this.setState({invalidate:true})
-      }
+
     }
   }
 
@@ -58,7 +59,7 @@ class Map extends Component<any, any>{
       return (
       <MapContainer
         key={this.state.invalidate}
-        style={{ height: "50vh" }}
+        style={{ height: "50%", width:"100%" }}
         center={[this.state.lon, this.state.lat]}
         zoom={this.state.zoom}
       >

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Box, useBreakpointValue, Flex, Spacer, Center, Square, Text, HStack, Grid, GridItem } from '@chakra-ui/react'
 import Helmet from "react-helmet"
 
-import Header from './components/Header'
+import Dashboard from './components/Dashboard'
 import Sidebar from './components/Sidebar'
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
@@ -28,11 +28,11 @@ export default function App() {
          crossOrigin=""></script>
       </Helmet>
       <Flex color="nord.0">
-        <Center h="100vh" bg="nord.0">
+        <Center h="100vh" bg="nord.1">
           <Sidebar />
         </Center>
-        <Square h="100vh" flex="1" bg="nord.1">
-          <Header />
+        <Square h="100vh" flex="1" bg="nord.0">
+          <Dashboard />
         </Square>
       </Flex>
     </>
