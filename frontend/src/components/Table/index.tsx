@@ -10,10 +10,6 @@ import {
 } from "@chakra-ui/react"
 import React, { Component } from 'react'
 
-interface tableEntry{
-  startDate:string,
-  endDate:string
-}
 
 class RangeTable extends Component{
   render(){

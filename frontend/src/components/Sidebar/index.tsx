@@ -1,62 +1,32 @@
-import {
-  Box,
-  Button,
-  Drawer,
-  DrawerOverlay,
-  DrawerCloseButton,
-  DrawerHeader,
-  DrawerBody,
-  DrawerContent,
-  VStack,
-} from '@chakra-ui/react'
+import {Box, VStack, Spacer, Flex } from '@chakra-ui/react'
+import { Calendar, Map, Home, Tool } from 'react-feather';  // icons
+import { Component } from 'react'
 
-interface Props {
-  onClose: Function
-  isOpen: boolean
-  variant: 'drawer' | 'sidebar'
-}
+class Sidebar extends Component{
+  constructor(props) {
+    super(props);
+  }
 
-const SidebarContent = ({ onClick }: { onClick: Function }) => (
-  <VStack>
-    <Button onClick={onClick} w="100%">
-      Home
-    </Button>
-    <Button onClick={onClick} w="100%">
-      About
-    </Button>
-    <Button onClick={onClick} w="100%">
-      Contact
-    </Button>
-  </VStack>
-)
+  render(){
+    return(
+      <Flex direction="column" height="100%">
+        <Box as="button" borderRadius="md" color="white" px={4} h={8}>
+          <Home />
+        </Box>
+        <Box as="button" borderRadius="md" color="white" px={4} h={8}>
+          <Map />
+        </Box>
+        <Box as="button" borderRadius="md" color="white" px={4} h={8}>
+          <Calendar />
+        </Box>
+        <Spacer />
+        <Box as="button" borderRadius="md" color="white" px={4} h={8}>
+          <Tool />
+        </Box>
+      </Flex>
+    )
+  }
 
-const Sidebar = ({ isOpen, variant, onClose }: Props) => {
-  return variant === 'sidebar' ? (
-    <Box
-      position="fixed"
-      left={0}
-      p={5}
-      w="200px"
-      top={0}
-      h="100%"
-      bg="#dfdfdf"
-    >
-      <SidebarContent onClick={onClose} />
-    </Box>
-  ) : (
-    <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
-      <DrawerOverlay>
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>Chakra-UI</DrawerHeader>
-          <DrawerBody>
-            <SidebarContent onClick={onClose} />
-          </DrawerBody>
-        </DrawerContent>
-      </DrawerOverlay>
-    </Drawer>
-  )
 }
 
 export default Sidebar
-

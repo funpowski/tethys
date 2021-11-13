@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Box, useBreakpointValue } from '@chakra-ui/react'
+import { Box, useBreakpointValue, Flex, Spacer, Center, Square, Text, HStack, Grid, GridItem } from '@chakra-ui/react'
 import Helmet from "react-helmet"
 
 import Header from './components/Header'
@@ -27,14 +27,14 @@ export default function App() {
          integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
          crossOrigin=""></script>
       </Helmet>
-      <Sidebar
-        variant={variants?.navigation}
-        isOpen={isSidebarOpen}
-        onClose={toggleSidebar}
-      />
-      <Box ml={!variants?.navigationButton && 200}>
-        <Header />
-      </Box>
+      <Flex color="nord.0">
+        <Center h="100vh" bg="nord.0">
+          <Sidebar />
+        </Center>
+        <Square h="100vh" flex="1" bg="nord.1">
+          <Header />
+        </Square>
+      </Flex>
     </>
   )
 }
