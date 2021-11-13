@@ -22,7 +22,6 @@ class Dashboard extends Component<any, any>{
   }
 
   rerenderMap(){
-    // console.log(this.trigger.current.focus())
     this.setState({invalidate:!this.state.invalidate})
   }
 
@@ -33,7 +32,7 @@ class Dashboard extends Component<any, any>{
           <Sidebar changeTab={this.changeTab}/>
         </Center>
         <Square h="100vh" flex="1" bg="nord.0">
-          <Box w="100%" h="100%">
+          <Box w="100%" h="100%" p={2}>
             {this.state.activeTab}
           </Box>
         </Square>

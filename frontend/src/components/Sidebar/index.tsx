@@ -13,7 +13,6 @@ class SidebarButton extends Component<any, any>{
   }
 
   clicked(){
-    console.log(this.props.title)
     this.props.updateTab(this.props.title)
   }
 
@@ -58,10 +57,6 @@ class Sidebar extends Component<any, any>{
 
   updateTab(name){
     this.props.changeTab(this.tabDict[name])
-  }
-
-  componentDidUpdate(prevProps){
-    console.log(this)
   }
 
   render(){

@@ -1,64 +1,37 @@
 import { MapContainer, TileLayer } from "react-leaflet";
 import React, { Component } from 'react'
-import { OpenStreetMapProvider } from 'leaflet-geosearch';
-
 
 // good info on adding markers
 // https://stackoverflow.com/questions/62182987/is-the-react-way-really-to-re-render-the-whole-react-leaflet-component-regular
-
 class PermitMap extends Component<any, any>{
   constructor(props) {
     super(props);
     this.state = {
-      invalidate:false,  // use this to toggle map rerender on tab click
-      lat:0,
-      lon:0,
-      city:null,
-      regionName:null,
-      zoom:8,
-      provider: new OpenStreetMapProvider()
+      lon: 39.7671,
+      lat: -105.0452,
+      zoom:7
     }
+    this.getUserLocation()
+      .then(data => this.setState({
+        lat:data.lon,
+        lon:data.lat,
+      })
+    )
   }
 
-  async componentDidMount(){
+  async getUserLocation(){
     // get user location by IP
     const locationAPIurl = "http://ip-api.com/json"
     const data = await fetch(locationAPIurl)
       .then(function(response) {
         return response.json();
-      });
-
-    // then, update state
-    this.setState({
-      city:data.city,
-      regionName: data.regionName
-    })
-
-    // then, update based on user location by searching for location in OSM
-    const query = `${this.state.city}, ${this.state.regionName}`;
-    const results = await this.state.provider.search({ query: query });
-    if(results.length > 0){
-      const location = results[1];
-      this.setState({
-        lat:location.x,
-        lon:location.y,
       })
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    if(this.props.invalidate !== prevProps.invalidate) // Check if it's a new user, you can also use some unique property, like the ID  (this.props.user.id !== prevProps.user.id)
-    {
-      // invalidate map on update to reflect button click
-      this.setState({invalidate:true})
-
-    }
+    return data
   }
 
   render(){
       return (
       <MapContainer
-        key={this.state.invalidate}
         style={{ height: "50%", width:"100%" }}
         center={[this.state.lon, this.state.lat]}
         zoom={this.state.zoom}
