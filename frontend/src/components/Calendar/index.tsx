@@ -1,7 +1,7 @@
 import { DateRange } from 'react-date-range';
 import { Component } from 'react';
 
-class RangePicker extends Component {
+class Calendar extends Component {
   handleSelect(ranges){
     console.log(ranges);
     // {
@@ -29,4 +29,4 @@ class RangePicker extends Component {
   }
 }
 
-export default RangePicker
+export default Calendar

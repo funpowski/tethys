@@ -6,7 +6,7 @@ import { OpenStreetMapProvider } from 'leaflet-geosearch';
 // good info on adding markers
 // https://stackoverflow.com/questions/62182987/is-the-react-way-really-to-re-render-the-whole-react-leaflet-component-regular
 
-class Map extends Component<any, any>{
+class PermitMap extends Component<any, any>{
   constructor(props) {
     super(props);
     this.state = {
@@ -73,4 +73,4 @@ class Map extends Component<any, any>{
   }
 }
 
-export default Map
+export default PermitMap

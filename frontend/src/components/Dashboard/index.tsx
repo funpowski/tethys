@@ -1,15 +1,9 @@
-import { Box, } from '@chakra-ui/react'
+import { Box, Flex, Center, Square } from '@chakra-ui/react'
 import { Component } from 'react'
 
-import Map from '../../components/Map'
-import RangePicker from '../../components/Calendar'
-import RangeTable from '../../components/Table'
 import LandingPage from '../../components/LandingPage'
+import Sidebar from '../../components/Sidebar'
 
-interface tableEntry{
-  startDate:string,
-  endDate:string
-}
 
 // good notes about why any is required https://stackoverflow.com/a/47562985/13354634
 class Dashboard extends Component<any, any>{
@@ -17,8 +11,14 @@ class Dashboard extends Component<any, any>{
     super(props);
     this.state = {
       invalidate:false,
-      datesList:[]
+      datesList:[],
+      activeTab: <LandingPage />
     }
+    this.changeTab = this.changeTab.bind(this)
+  }
+
+  changeTab(newTab){
+    this.setState({activeTab:newTab});
   }
 
   rerenderMap(){
@@ -28,9 +28,16 @@ class Dashboard extends Component<any, any>{
 
   render(){
     return (
-      <Box w="100%" h="100%">
-        <LandingPage />
-      </Box>
+      <Flex color="nord.0">
+        <Center h="100vh" bg="nord.1">
+          <Sidebar changeTab={this.changeTab}/>
+        </Center>
+        <Square h="100vh" flex="1" bg="nord.0">
+          <Box w="100%" h="100%">
+            {this.state.activeTab}
+          </Box>
+        </Square>
+      </Flex>
     )
   }
 }

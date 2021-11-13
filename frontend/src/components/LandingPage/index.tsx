@@ -3,9 +3,6 @@ import { Component } from 'react'
 
 // good notes about why any is required https://stackoverflow.com/a/47562985/13354634
 class LandingPage extends Component<any, any>{
-  constructor(props) {
-    super(props);
-  }
 
   render(){
     return (
