@@ -1,8 +1,4 @@
 import Helmet from "react-helmet"
-
-import 'react-date-range/dist/styles.css'; // main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
-
 import Dashboard from './components/Dashboard'
 
 export default function App() {

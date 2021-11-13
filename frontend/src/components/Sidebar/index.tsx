@@ -43,16 +43,12 @@ class Sidebar extends Component<any, any>{
     this.updateTab = this.updateTab.bind(this)
   }
 
-  homeIcon = <Feather.Home/>;
-  mapIcon = <Feather.Map />;
-  calendarIcon = <Feather.Calendar />;
-  settingsIcon = <Feather.Tool />;
-
   tabDict = {
     "Home": <LandingPage />,
     "Map": <Map />,
     "Calendar": <Calendar />,
-    "Settings": <LandingPage />
+    "Settings": <LandingPage />,
+    "Account": <LandingPage />
   }
 
   updateTab(name){
@@ -63,12 +59,15 @@ class Sidebar extends Component<any, any>{
     return(
       <Flex direction="column" height="100%" p="2">
         <VStack spacing="2">
-          <SidebarButton title="Home" icon={this.homeIcon} activeTab={this.state.activeTab} updateTab={this.updateTab}/>
-          <SidebarButton title="Map" icon={this.mapIcon} activeTab={this.state.activeTab} updateTab={this.updateTab}/>
-          <SidebarButton title="Calendar" icon={this.calendarIcon} activeTab={this.state.activeTab} updateTab={this.updateTab}/>
+          <SidebarButton title="Home" icon={<Feather.Home />} activeTab={this.state.activeTab} updateTab={this.updateTab}/>
+          <SidebarButton title="Map" icon={<Feather.Map />} activeTab={this.state.activeTab} updateTab={this.updateTab}/>
+          <SidebarButton title="Calendar" icon={<Feather.Calendar />} activeTab={this.state.activeTab} updateTab={this.updateTab}/>
         </VStack>
         <Spacer />
-        <SidebarButton title="Settings" icon={this.settingsIcon} activeTab={this.state.activeTab} updateTab={this.updateTab}/>
+        <VStack spacing="2">
+          <SidebarButton title="Account" icon={<Feather.User />} activeTab={this.state.activeTab} updateTab={this.updateTab}/>
+          <SidebarButton title="Settings" icon={<Feather.Tool />} activeTab={this.state.activeTab} updateTab={this.updateTab}/>
+        </VStack>
       </Flex>
     )
   }
