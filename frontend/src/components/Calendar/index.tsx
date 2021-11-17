@@ -1,52 +1,57 @@
-import { DateRange } from 'react-date-range';
-import { Box, Flex, Center, Square, Text } from '@chakra-ui/react'
+import { Box, Flex, Center } from '@chakra-ui/react'
 import { Component } from 'react';
+import DatePicker from "react-datepicker";
 import {
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
   TableCaption,
 } from "@chakra-ui/react"
 
-import 'react-date-range/dist/styles.css'; // main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
+import "./react-datepicker.css";
 
+class Calendar extends Component<any, any> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      startDate: new Date(),
+      endDate: null,
+      calendarMonthDivWidth: 240,
+      viewportWidth: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
+    }
+  }
 
-class Calendar extends Component {
   handleSelect(ranges){
     console.log(ranges);
-    // {
-    //   selection: {
-    //     startDate: [native Date Object],
-    //     endDate: [native Date Object],
-    //   }
-    // }
   }
+
   render(){
-    const selectionRange = {
-      startDate: new Date(),
-      endDate: new Date(),
-      key: 'selection',
-    }
     return (
-      <Box>
-        <Box w="100%" bg="tomato">
+      <Flex spacing="2" h="100%" direction="column">
+        <Box w="100%" p={2}>
           <Center>
-            <DateRange
-              ranges={[selectionRange]}
-              onChange={this.handleSelect}
-              months={3}
-              direction="horizontal"
-              scroll={{ enabled: true }}
+            <DatePicker
+              selected={this.state.startDate}
+              onChange={(dates) => {
+                const [start, end] = dates;
+                this.setState({
+                  startDate:start,
+                  endDate:end
+                })
+              }}
+              startDate={this.state.startDate}
+              endDate={this.state.endDate}
+              monthsShown={Math.round(this.state.viewportWidth/this.state.calendarMonthDivWidth*0.9)}
+              selectsRange
+              inline
             />
           </Center>
         </Box>
-        <Box w="100%" h="100%" bg="white">
-          <Table variant="simple">
+        <Box w="100%" overflow="auto" flex={1} p={2}>
+          <Table variant="simple" colorScheme="nordscheme" bg="nord.7">
             <TableCaption>Imperial to metric conversion factors</TableCaption>
             <Thead>
               <Tr>
@@ -61,20 +66,10 @@ class Calendar extends Component {
                 <Td>millimetres (mm)</Td>
                 <Td isNumeric>25.4</Td>
               </Tr>
-              <Tr>
-                <Td>feet</Td>
-                <Td>centimetres (cm)</Td>
-                <Td isNumeric>30.48</Td>
-              </Tr>
-              <Tr>
-                <Td>yards</Td>
-                <Td>metres (m)</Td>
-                <Td isNumeric>0.91444</Td>
-              </Tr>
             </Tbody>
           </Table>
         </Box>
-      </Box>
+      </Flex>
     )
   }
 }
