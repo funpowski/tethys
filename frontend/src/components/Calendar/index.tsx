@@ -1,5 +1,5 @@
-import { Box, Flex, Center, Spacer } from '@chakra-ui/react'
-import { Component } from 'react';
+import { Box, Flex, Center, Spacer, Checkbox, Stack } from '@chakra-ui/react'
+import React, { Component } from 'react';
 import DatePicker from "react-datepicker";
 import {
   Table,
@@ -14,12 +14,26 @@ import {
 import "./react-datepicker.css";
 
 function TableEntry(props){
+  console.log(props.riverName)
   return (
     <Tr>
       <Td>{props.start.toLocaleDateString('en-us')}</Td>
       <Td>{props.end.toLocaleDateString('en-us')}</Td>
-      <Td>River place holder</Td>
+      <Td>{props.name}</Td>
     </Tr>
+  )
+}
+function RiverCheckboxes(props) {
+  // BONE figure out better way to do this
+  return(
+    <Stack spacing={10} direction='column'>
+      <Checkbox onChange={(e) => props.riverSelector("Middle Fork Salmon", e.target.checked)}>
+        Middle Fork Salmon
+      </Checkbox>
+      <Checkbox onChange={(e) => props.riverSelector("Main Salmon", e.target.checked)}>
+        Main Salmon
+      </Checkbox>
+    </Stack>
   )
 }
 
@@ -30,7 +44,9 @@ class Calendar extends Component<any, any> {
       startDate: new Date(),
       endDate: null,
       tableData:[],
+      riverSelection:[],
     }
+    this.updateRiverSelection = this.updateRiverSelection.bind(this)
   }
 
   datePickerChange(dates){
@@ -46,6 +62,19 @@ class Calendar extends Component<any, any> {
     this.setState({
       startDate:start,
       endDate:end,
+    })
+  }
+
+  updateRiverSelection(riverName, isChecked){
+    // BONE, need to change riverSelection to dict then pop riverName based on isChecked value
+    var riverSelectList = this.state.riverSelection;
+    if (isChecked){
+      riverSelectList.push(riverName)
+    } else {
+      riverSelectList = riverSelectList.filter(e => e !== riverName)
+    }
+    this.setState({
+      riverSelection: riverSelectList,
     })
   }
 
@@ -67,9 +96,16 @@ class Calendar extends Component<any, any> {
         </Box>
         <Flex>
         <Spacer />
+          <Box w="720px" overflow="auto" bg="white" p={2}>
+            <RiverCheckboxes riverSelector={this.updateRiverSelection}/>
+          </Box>
+        <Spacer />
+        </Flex>
+        <Flex>
+        <Spacer />
           <Box w="720px" overflow="auto">
             <Table variant="simple" colorScheme="nordscheme" bg="nord.7">
-              <TableCaption>Imperial to metric conversion factors</TableCaption>
+              <TableCaption>BONE figure this out</TableCaption>
               <Thead>
                 <Tr>
                   <Th>Start Date</Th>
@@ -79,12 +115,14 @@ class Calendar extends Component<any, any> {
               </Thead>
               <Tbody>
                  {this.state.tableData.map((data, i) =>
-                   <TableEntry
-                      key={i}
-                      start={data.start}
-                      end={data.end}
-                   />
-                 )}
+                   this.state.riverSelection.map((riverName, j) =>
+                     <TableEntry
+                        key={i+j}
+                        start={data.start}
+                        end={data.end}
+                        name={riverName}
+                     />
+                 ))}
               </Tbody>
             </Table>
           </Box>
