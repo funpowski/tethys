@@ -1,4 +1,4 @@
-import { Box, Flex, Center } from '@chakra-ui/react'
+import { Box, Flex, Center, Spacer } from '@chakra-ui/react'
 import { Component } from 'react';
 import DatePicker from "react-datepicker";
 import {
@@ -13,19 +13,40 @@ import {
 
 import "./react-datepicker.css";
 
+function TableEntry(props){
+  return (
+    <Tr>
+      <Td>{props.start.toLocaleDateString('en-us')}</Td>
+      <Td>{props.end.toLocaleDateString('en-us')}</Td>
+      <Td>River place holder</Td>
+    </Tr>
+  )
+}
+
 class Calendar extends Component<any, any> {
   constructor(props) {
     super(props);
     this.state = {
       startDate: new Date(),
       endDate: null,
-      calendarMonthDivWidth: 240,
-      viewportWidth: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
+      tableData:[],
     }
   }
 
-  handleSelect(ranges){
-    console.log(ranges);
+  datePickerChange(dates){
+    const [start, end] = dates;
+    if (end != null){
+      this.setState({
+        tableData: [...this.state.tableData, {
+            start:start,
+            end:end,
+        }]
+      })
+    }
+    this.setState({
+      startDate:start,
+      endDate:end,
+    })
   }
 
   render(){
@@ -35,40 +56,40 @@ class Calendar extends Component<any, any> {
           <Center>
             <DatePicker
               selected={this.state.startDate}
-              onChange={(dates) => {
-                const [start, end] = dates;
-                this.setState({
-                  startDate:start,
-                  endDate:end
-                })
-              }}
+              onChange={(dates) => this.datePickerChange(dates)}
               startDate={this.state.startDate}
               endDate={this.state.endDate}
-              monthsShown={Math.round(this.state.viewportWidth/this.state.calendarMonthDivWidth*0.9)}
+              monthsShown={3}
               selectsRange
               inline
             />
           </Center>
         </Box>
-        <Box w="100%" overflow="auto" flex={1} p={2}>
-          <Table variant="simple" colorScheme="nordscheme" bg="nord.7">
-            <TableCaption>Imperial to metric conversion factors</TableCaption>
-            <Thead>
-              <Tr>
-                <Th>To convert</Th>
-                <Th>into</Th>
-                <Th isNumeric>multiply by</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              <Tr>
-                <Td>inches</Td>
-                <Td>millimetres (mm)</Td>
-                <Td isNumeric>25.4</Td>
-              </Tr>
-            </Tbody>
-          </Table>
-        </Box>
+        <Flex>
+        <Spacer />
+          <Box w="720px" overflow="auto">
+            <Table variant="simple" colorScheme="nordscheme" bg="nord.7">
+              <TableCaption>Imperial to metric conversion factors</TableCaption>
+              <Thead>
+                <Tr>
+                  <Th>Start Date</Th>
+                  <Th>End Date</Th>
+                  <Th>River</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                 {this.state.tableData.map((data, i) =>
+                   <TableEntry
+                      key={i}
+                      start={data.start}
+                      end={data.end}
+                   />
+                 )}
+              </Tbody>
+            </Table>
+          </Box>
+        <Spacer />
+        </Flex>
       </Flex>
     )
   }
