@@ -11,6 +11,9 @@ class LandingPage extends Component<any, any>{
           <Text fontSize="6xl" color="nord.4" >
              tethys.[something]
           </Text>
+          <Text color="nord.4">
+             My silly little app for booking silly little river trips.
+          </Text>
         </Box>
       </Center>
     )

@@ -14,23 +14,9 @@ import {
 
 import "./react-datepicker.css";
 
-// TABLE ENTRY CLASS
-function TableEntry(props){
-  return (
-    <Tr>
-      <Td>{props.start.toLocaleDateString('en-us')}</Td>
-      <Td>{props.end.toLocaleDateString('en-us')}</Td>
-      <Td>{props.name}</Td>
-      <Td>
-        <IconButton icon={<Feather.XCircle />} />
-      </Td>
-    </Tr>
-  )
-}
 
 // RIVER CHECKBOX CLASS
 function RiverCheckboxes(props) {
-  // BONE figure out better way to do this
   return(
     <Stack spacing={10} direction='column'>
       <Checkbox onChange={(e) => props.riverSelector("Middle Fork Salmon", e.target.checked)}>
@@ -58,11 +44,12 @@ class Calendar extends Component<any, any> {
       riverSelection:{},
     }
     this.updateRiverSelection = this.updateRiverSelection.bind(this)
+    this.deleteTableRow = this.deleteTableRow.bind(this)
   }
 
   datePickerChange(dates){
     const [start, end] = dates;
-    if (end != null){
+    if (end != null && Object.keys(this.state.riverSelection).length !== 0){
       for (const [name, _] of Object.entries(this.state.riverSelection)) {
         var tableData = this.state.tableData;
         tableData.push({
@@ -74,7 +61,7 @@ class Calendar extends Component<any, any> {
       this.setState({
         tableData:tableData
       })
-      console.log(this.state.tableData)
+      console.log(this.state.riverSelection)
     }
     this.setState({
       startDate:start,
@@ -94,17 +81,8 @@ class Calendar extends Component<any, any> {
     })
   }
 
-  updateTable(){
-    return(
-      this.state.tableData.map((data, i) =>
-        <TableEntry
-           key={i}
-           start={data.start}
-           end={data.end}
-           name={data.name}
-        />
-      )
-    )
+  deleteTableRow(){
+    console.log("fuck")
   }
 
   render(){
@@ -144,7 +122,16 @@ class Calendar extends Component<any, any> {
                 </Tr>
               </Thead>
               <Tbody>
-                {this.updateTable()}
+                {this.state.tableData.map((data, i) =>
+                  <Tr>
+                    <Td>{data.start.toLocaleDateString('en-us')}</Td>
+                    <Td>{data.end.toLocaleDateString('en-us')}</Td>
+                    <Td>{data.name}</Td>
+                    <Td>
+                      <IconButton onClick={() => this.deleteTableRow()} icon={<Feather.XCircle />} />
+                    </Td>
+                  </Tr>
+                )}
               </Tbody>
             </Table>
           </Box>
