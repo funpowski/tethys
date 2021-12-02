@@ -40,7 +40,7 @@ class Calendar extends Component<any, any> {
     this.state = {
       startDate: new Date(),
       endDate: null,
-      tableData:[],
+      tableData:{},
       riverSelection:{},
     }
     this.updateRiverSelection = this.updateRiverSelection.bind(this)
@@ -52,16 +52,17 @@ class Calendar extends Component<any, any> {
     if (end != null && Object.keys(this.state.riverSelection).length !== 0){
       for (const [name, _] of Object.entries(this.state.riverSelection)) {
         var tableData = this.state.tableData;
-        tableData.push({
+        var tableIdx = Object.keys(this.state.tableData).length;
+        tableData[tableIdx] = {
               start:start,
               end:end,
-              name:name
-        })
+              name:name,
+              id: tableIdx,
+        }
       }
       this.setState({
         tableData:tableData
       })
-      console.log(this.state.riverSelection)
     }
     this.setState({
       startDate:start,
@@ -81,8 +82,12 @@ class Calendar extends Component<any, any> {
     })
   }
 
-  deleteTableRow(){
-    console.log("fuck")
+  deleteTableRow(key){
+    var tableData = this.state.tableData;
+    delete tableData[key];
+    this.setState({
+      tableData:tableData
+    })
   }
 
   render(){
@@ -122,13 +127,13 @@ class Calendar extends Component<any, any> {
                 </Tr>
               </Thead>
               <Tbody>
-                {this.state.tableData.map((data, i) =>
+                {Object.keys(this.state.tableData).map((key, i) =>
                   <Tr>
-                    <Td>{data.start.toLocaleDateString('en-us')}</Td>
-                    <Td>{data.end.toLocaleDateString('en-us')}</Td>
-                    <Td>{data.name}</Td>
+                    <Td>{this.state.tableData[key].start.toLocaleDateString('en-us')}</Td>
+                    <Td>{this.state.tableData[key].end.toLocaleDateString('en-us')}</Td>
+                    <Td>{this.state.tableData[key].name}</Td>
                     <Td>
-                      <IconButton onClick={() => this.deleteTableRow()} icon={<Feather.XCircle />} />
+                      <IconButton onClick={() => this.deleteTableRow(key)} icon={<Feather.XCircle />} />
                     </Td>
                   </Tr>
                 )}
