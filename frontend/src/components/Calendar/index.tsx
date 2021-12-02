@@ -1,6 +1,7 @@
-import { Box, Flex, Center, Spacer, Checkbox, Stack } from '@chakra-ui/react'
+import { Box, IconButton, Flex, Center, Spacer, Checkbox, Stack } from '@chakra-ui/react'
 import React, { Component } from 'react';
 import DatePicker from "react-datepicker";
+import * as Feather from 'react-feather';  // icons
 import {
   Table,
   Thead,
@@ -13,16 +14,21 @@ import {
 
 import "./react-datepicker.css";
 
+// TABLE ENTRY CLASS
 function TableEntry(props){
-  console.log(props.riverName)
   return (
     <Tr>
       <Td>{props.start.toLocaleDateString('en-us')}</Td>
       <Td>{props.end.toLocaleDateString('en-us')}</Td>
       <Td>{props.name}</Td>
+      <Td>
+        <IconButton icon={<Feather.XCircle />} />
+      </Td>
     </Tr>
   )
 }
+
+// RIVER CHECKBOX CLASS
 function RiverCheckboxes(props) {
   // BONE figure out better way to do this
   return(
@@ -37,6 +43,11 @@ function RiverCheckboxes(props) {
   )
 }
 
+// CALENDAR CLASS
+// two structs:
+//  riverRange is list of river name, start/end dates for table
+//  temp struct for storing stuff intermediary??
+
 class Calendar extends Component<any, any> {
   constructor(props) {
     super(props);
@@ -44,7 +55,7 @@ class Calendar extends Component<any, any> {
       startDate: new Date(),
       endDate: null,
       tableData:[],
-      riverSelection:[],
+      riverSelection:{},
     }
     this.updateRiverSelection = this.updateRiverSelection.bind(this)
   }
@@ -52,12 +63,15 @@ class Calendar extends Component<any, any> {
   datePickerChange(dates){
     const [start, end] = dates;
     if (end != null){
-      this.setState({
-        tableData: [...this.state.tableData, {
-            start:start,
-            end:end,
-        }]
-      })
+      for (const [name, _] of Object.entries(this.state.riverSelection)) {
+        this.setState({
+          tableData: [...this.state.tableData, {
+              start:start,
+              end:end,
+              name:name
+          }]
+        })
+      }
     }
     this.setState({
       startDate:start,
@@ -66,16 +80,28 @@ class Calendar extends Component<any, any> {
   }
 
   updateRiverSelection(riverName, isChecked){
-    // BONE, need to change riverSelection to dict then pop riverName based on isChecked value
     var riverSelectList = this.state.riverSelection;
     if (isChecked){
-      riverSelectList.push(riverName)
+      riverSelectList[riverName] = riverName;
     } else {
-      riverSelectList = riverSelectList.filter(e => e !== riverName)
+      delete riverSelectList[riverName]
     }
     this.setState({
       riverSelection: riverSelectList,
     })
+  }
+
+  updateTable(){
+    return(
+      this.state.tableData.map((data, i) =>
+        <TableEntry
+           key={i}
+           start={data.start}
+           end={data.end}
+           name={data.name}
+        />
+      )
+    )
   }
 
   render(){
@@ -111,18 +137,11 @@ class Calendar extends Component<any, any> {
                   <Th>Start Date</Th>
                   <Th>End Date</Th>
                   <Th>River</Th>
+                  <Th></Th>
                 </Tr>
               </Thead>
               <Tbody>
-                 {this.state.tableData.map((data, i) =>
-                   this.state.riverSelection.map((riverName, j) =>
-                     <TableEntry
-                        key={i+j}
-                        start={data.start}
-                        end={data.end}
-                        name={riverName}
-                     />
-                 ))}
+                {this.updateTable()}
               </Tbody>
             </Table>
           </Box>
