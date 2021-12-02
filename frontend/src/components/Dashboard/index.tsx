@@ -48,7 +48,6 @@ class Dashboard extends Component<any, any>{
     this.updateTab = this.updateTab.bind(this);
     this.updateTableData = this.updateTableData.bind(this);
     this.deleteTableRow = this.deleteTableRow.bind(this);
-    console.log(this.state)
   }
 
   updateTab(name){

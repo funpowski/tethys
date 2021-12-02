@@ -1,5 +1,5 @@
-import { MapContainer, TileLayer } from "react-leaflet";
-import React, { Component } from 'react'
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import React, { Component} from 'react'
 
 // good info on adding markers
 // https://stackoverflow.com/questions/62182987/is-the-react-way-really-to-re-render-the-whole-react-leaflet-component-regular
@@ -9,7 +9,10 @@ class PermitMap extends Component<any, any>{
     this.state = {
       lon: 39.7671,
       lat: -105.0452,
-      zoom:7
+      zoom:7,
+      jsonFilesNames:['GC', 'desogray', 'middlefork', 'rogue'],
+      jsonFiles:[],
+
     }
     this.getUserLocation()
       .then(data => this.setState({
@@ -17,7 +20,22 @@ class PermitMap extends Component<any, any>{
         lon:data.lat,
       })
     )
+    this.state.jsonFilesNames.forEach((name) =>
+      this.loadJson(name)
+    )
   }
+
+  async loadJson(name){
+      const data = await fetch(`river_data/${name}.json`)
+        .then(function(response) {
+          return response.json()
+        })
+      var jsonFiles = this.state.jsonFiles
+      jsonFiles.push(data);
+      this.setState({
+        jsonFiles: jsonFiles
+      })
+    }
 
   async getUserLocation(){
     // get user location by IP
@@ -40,7 +58,11 @@ class PermitMap extends Component<any, any>{
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-
+        {this.state.jsonFiles.map((json, i) =>
+          <GeoJSON
+            data={json}
+          />
+        )}
       </MapContainer>
     )
   }
