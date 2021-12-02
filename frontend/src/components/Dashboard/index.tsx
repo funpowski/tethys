@@ -47,18 +47,25 @@ class Dashboard extends Component<any, any>{
     }
     this.updateTab = this.updateTab.bind(this);
     this.updateTableData = this.updateTableData.bind(this);
+    this.deleteTableRow = this.deleteTableRow.bind(this);
     console.log(this.state)
   }
 
-  getTab(name){
+  updateTab(name){
     var tabDict = {
       "Home": <LandingPage />,
       "Map": <Map />,
-      "Calendar": <Calendar tableData={this.state.tableData} updateTableData={this.updateTableData}/>,
+      "Calendar": <Calendar
+        tableData={this.state.tableData}
+        deleteTableRow={this.deleteTableRow}
+        updateTableData={this.updateTableData}
+        />,
       "Settings": <LandingPage />,
       "Account": <LandingPage />
     }
-    return tabDict[name];
+    this.setState({
+      activeTab: tabDict[name]
+    })
   }
 
   updateTableData(newTableData){
@@ -67,10 +74,10 @@ class Dashboard extends Component<any, any>{
     })
   }
 
-  updateTab(name){
-    this.setState({
-      activeTab: this.getTab(name)
-    })
+  deleteTableRow(key){
+    var tableData = this.state.tableData;
+    delete tableData[key];
+    this.updateTableData(tableData);
   }
 
   render(){

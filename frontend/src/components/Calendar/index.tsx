@@ -41,9 +41,9 @@ class Calendar extends Component<any, any> {
       startDate: new Date(),
       endDate: null,
       riverSelection:{},
+      tableData:this.props.tableData,
     }
     this.updateRiverSelection = this.updateRiverSelection.bind(this)
-    this.deleteTableRow = this.deleteTableRow.bind(this)
   }
 
   datePickerChange(dates){
@@ -79,10 +79,13 @@ class Calendar extends Component<any, any> {
     })
   }
 
-  deleteTableRow(key){
-    var tableData = this.props.tableData;
-    delete tableData[key];
-    this.props.updateTableData(tableData);
+  deleteRow(key){
+    // break this out into own function with semi-useless setState
+    // -> this is so component updates automatically onclick
+    this.props.deleteTableRow(key);
+    this.setState({
+      tableData:this.props.tableData,
+    })
   }
 
   render(){
@@ -128,7 +131,7 @@ class Calendar extends Component<any, any> {
                     <Td>{this.props.tableData[key].end.toLocaleDateString('en-us')}</Td>
                     <Td>{this.props.tableData[key].name}</Td>
                     <Td>
-                      <IconButton onClick={() => this.deleteTableRow(key)} icon={<Feather.XCircle />} />
+                      <IconButton onClick={() => this.deleteRow(key)} icon={<Feather.XCircle />} />
                     </Td>
                   </Tr>
                 )}
