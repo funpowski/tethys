@@ -9,7 +9,7 @@ class LandingPage extends Component<any, any>{
       <Center vertical-align="center">
         <Box bg="nord.1" p="4" borderRadius="10" >
           <Text fontSize="6xl" color="nord.4" >
-             tethys.[something]
+             tethys.surf 🌊
           </Text>
           <Text color="nord.4">
              My silly little app for booking silly little river trips.

@@ -40,7 +40,6 @@ class Calendar extends Component<any, any> {
     this.state = {
       startDate: new Date(),
       endDate: null,
-      tableData:{},
       riverSelection:{},
     }
     this.updateRiverSelection = this.updateRiverSelection.bind(this)
@@ -51,7 +50,7 @@ class Calendar extends Component<any, any> {
     const [start, end] = dates;
     if (end != null && Object.keys(this.state.riverSelection).length !== 0){
       for (const [name, _] of Object.entries(this.state.riverSelection)) {
-        var tableData = this.state.tableData;
+        var tableData = this.props.tableData;
         var key = `${start.toString()}${end.toString()}${name}`;  // really inelegant hash key but avoids duplicates
         tableData[key] = {
               start:start,
@@ -60,9 +59,7 @@ class Calendar extends Component<any, any> {
               id: key,
         }
       }
-      this.setState({
-        tableData:tableData
-      })
+      this.props.updateTableData(tableData);
     }
     this.setState({
       startDate:start,
@@ -83,11 +80,9 @@ class Calendar extends Component<any, any> {
   }
 
   deleteTableRow(key){
-    var tableData = this.state.tableData;
+    var tableData = this.props.tableData;
     delete tableData[key];
-    this.setState({
-      tableData:tableData
-    })
+    this.props.updateTableData(tableData);
   }
 
   render(){
@@ -123,15 +118,15 @@ class Calendar extends Component<any, any> {
                   <Th>Start Date</Th>
                   <Th>End Date</Th>
                   <Th>River</Th>
-                  <Th></Th>
+                  <Th>Remove</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {Object.keys(this.state.tableData).map((key, i) =>
+                {Object.keys(this.props.tableData).map((key, i) =>
                   <Tr>
-                    <Td>{this.state.tableData[key].start.toLocaleDateString('en-us')}</Td>
-                    <Td>{this.state.tableData[key].end.toLocaleDateString('en-us')}</Td>
-                    <Td>{this.state.tableData[key].name}</Td>
+                    <Td>{this.props.tableData[key].start.toLocaleDateString('en-us')}</Td>
+                    <Td>{this.props.tableData[key].end.toLocaleDateString('en-us')}</Td>
+                    <Td>{this.props.tableData[key].name}</Td>
                     <Td>
                       <IconButton onClick={() => this.deleteTableRow(key)} icon={<Feather.XCircle />} />
                     </Td>
