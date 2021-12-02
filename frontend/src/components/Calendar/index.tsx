@@ -52,12 +52,12 @@ class Calendar extends Component<any, any> {
     if (end != null && Object.keys(this.state.riverSelection).length !== 0){
       for (const [name, _] of Object.entries(this.state.riverSelection)) {
         var tableData = this.state.tableData;
-        var tableIdx = Object.keys(this.state.tableData).length;
-        tableData[tableIdx] = {
+        var key = `${start.toString()}${end.toString()}${name}`;  // really inelegant hash key but avoids duplicates
+        tableData[key] = {
               start:start,
               end:end,
               name:name,
-              id: tableIdx,
+              id: key,
         }
       }
       this.setState({
