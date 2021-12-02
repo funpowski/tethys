@@ -64,14 +64,17 @@ class Calendar extends Component<any, any> {
     const [start, end] = dates;
     if (end != null){
       for (const [name, _] of Object.entries(this.state.riverSelection)) {
-        this.setState({
-          tableData: [...this.state.tableData, {
+        var tableData = this.state.tableData;
+        tableData.push({
               start:start,
               end:end,
               name:name
-          }]
         })
       }
+      this.setState({
+        tableData:tableData
+      })
+      console.log(this.state.tableData)
     }
     this.setState({
       startDate:start,
