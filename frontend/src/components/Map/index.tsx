@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, Popup } from "react-leaflet";
 import React, { Component} from 'react'
 
 // good info on adding markers
@@ -47,6 +47,38 @@ class PermitMap extends Component<any, any>{
     return data
   }
 
+  highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        weight: 5,
+        dashArray: '',
+        fillOpacity: 0.7
+    });
+  }
+
+  resetHighlight(e) {
+    var layer = e.target;
+    layer.setStyle({
+        weight: 3,
+        dashArray: '',
+        fillOpacity: 1
+    });
+  }
+
+  onClick(e){
+    console.log("fuck")
+  }
+
+  onEachFeature(feature,layer) {
+    layer.bindTooltip(feature.properties.label);
+    layer.on({
+      mouseover: this.highlightFeature,
+      mouseout: this.resetHighlight,
+      click: this.onClick,
+    });
+  }
+
   render(){
       return (
       <MapContainer
@@ -61,7 +93,9 @@ class PermitMap extends Component<any, any>{
         {this.state.jsonFiles.map((json, i) =>
           <GeoJSON
             data={json}
-          />
+            onEachFeature={this.onEachFeature.bind(this)}
+          >
+          </GeoJSON>
         )}
       </MapContainer>
     )

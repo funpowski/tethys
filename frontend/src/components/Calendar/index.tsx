@@ -49,7 +49,7 @@ class Calendar extends Component<any, any> {
   datePickerChange(dates){
     const [start, end] = dates;
     if (end != null && Object.keys(this.state.riverSelection).length !== 0){
-      for (const [name, _] of Object.entries(this.state.riverSelection)) {
+      for (const name of Object.keys(this.state.riverSelection)) {
         var tableData = this.props.tableData;
         var key = `${start.toString()}${end.toString()}${name}`;  // really inelegant hash key but avoids duplicates
         tableData[key] = {

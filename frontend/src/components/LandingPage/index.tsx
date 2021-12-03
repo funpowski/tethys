@@ -12,7 +12,7 @@ class LandingPage extends Component<any, any>{
              tethys.surf 🌊
           </Text>
           <Text color="nord.4">
-             My silly little app for booking silly little river trips.
+             A silly little app for booking silly little river trips.
           </Text>
         </Box>
       </Center>
