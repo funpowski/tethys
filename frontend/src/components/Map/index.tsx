@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, GeoJSON, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, Tooltip } from "react-leaflet";
 import React, { Component} from 'react'
 
 // good info on adding markers
@@ -12,6 +12,28 @@ class PermitMap extends Component<any, any>{
       zoom:7,
       jsonFilesNames:['GC', 'desogray', 'middlefork', 'rogue'],
       jsonFiles:[],
+      riverInfo:{
+        'GC': {
+          name: 'Grand Canyon',
+          available: true,
+          availability: ['4/1/22']
+        },
+        'desogray': {
+          name: 'Desolation Gray',
+          available: false,
+          availability: []
+        },
+        'middlefork': {
+          name: 'Middle Fork of the Salmon River',
+          available: false,
+          availability: []
+        },
+        'rogue': {
+          name: 'Rogue River',
+          available: false,
+          availability: []
+        },
+      }
 
     }
     this.getUserLocation()
@@ -26,10 +48,17 @@ class PermitMap extends Component<any, any>{
   }
 
   async loadJson(name){
-      const data = await fetch(`river_data/${name}.json`)
+      // load data
+      const fgdata = await fetch(`river_data/${name}.json`)
         .then(function(response) {
-          return response.json()
+          return response.json();
         })
+
+      // extracted data is feature group so we strip then add stuff
+      const data = fgdata.features[0]
+      Object.assign(data.properties, this.state.riverInfo[name])
+
+      // append data to list
       var jsonFiles = this.state.jsonFiles
       jsonFiles.push(data);
       this.setState({
@@ -47,36 +76,61 @@ class PermitMap extends Component<any, any>{
     return data
   }
 
-  highlightFeature(e) {
-    var layer = e.target;
-
-    layer.setStyle({
-        weight: 5,
-        dashArray: '',
-        fillOpacity: 0.7
-    });
-  }
-
-  resetHighlight(e) {
-    var layer = e.target;
-    layer.setStyle({
-        weight: 3,
-        dashArray: '',
-        fillOpacity: 1
-    });
-  }
-
-  onClick(e){
-    console.log("fuck")
-  }
-
   onEachFeature(feature,layer) {
     layer.bindTooltip(feature.properties.label);
+    const highlightWeight = 5;
+    const nonHighlightWeight = 3;
     layer.on({
-      mouseover: this.highlightFeature,
-      mouseout: this.resetHighlight,
-      click: this.onClick,
+      mouseover: (e) => {
+        e.target.setStyle({
+          weight: highlightWeight,
+        })
+      },
+
+      mouseout: (e) => {
+        e.target.setStyle({
+          weight: nonHighlightWeight,
+        })
+
+      },
+      click: (e) => {
+        console.log("fart")
+      },
     });
+  }
+
+  getStyle(feature, layer){
+    var color;
+    switch(feature.properties.available){
+      case true:
+        color = '#00FF00';
+        break;
+      case false:
+        color = '#FF0000';
+        break;
+    }
+    return {
+      weight: 3,
+      opacity: 1,
+      color: color,
+    };
+  }
+
+  returnTooltip(json){
+    switch (json.properties.available){
+      case true:
+        return(
+          <Tooltip >
+            Click for availability of {json.properties.name}
+          </Tooltip>
+        )
+      case false:
+        return(
+          <Tooltip >
+            No cancellation dates currently available for {json.properties.name}
+          </Tooltip>
+        )
+    }
   }
 
   render(){
@@ -94,7 +148,9 @@ class PermitMap extends Component<any, any>{
           <GeoJSON
             data={json}
             onEachFeature={this.onEachFeature.bind(this)}
+            style={this.getStyle.bind(this)}
           >
+            {this.returnTooltip(json)}
           </GeoJSON>
         )}
       </MapContainer>
