@@ -30,7 +30,7 @@ class PermitMap extends Component<any, any>{
         },
         'rogue': {
           name: 'Rogue River',
-          available: false,
+          available: true,
           availability: []
         },
       }
