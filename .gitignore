@@ -2,9 +2,4 @@ __pycache__/*
 .DS_Store
 .swo
 .swp
-frontend/node_modules/*
-
-# add in stuff to ignore pypi artifacts
-scraper/dist/*
-scraper/build/*
-scraper/tethysio.egg-info
+aux
