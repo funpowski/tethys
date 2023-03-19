@@ -1,1 +1,0 @@
-from tethysio.scraper import *
