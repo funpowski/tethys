@@ -3,26 +3,27 @@ on:
   push:
     branches:
       - main
+# set permissions for AWS creds
+permissions:
+  id-token: write
+  contents: read
 jobs:
   deploy:
     name: deploy lambda zip
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
-      - name: checkout source code
-        uses: actions/checkout@v1
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::***REMOVED***:role/github_actions
           role-session-name: tethys_github_action
           aws-region: us-east-2
+      - name: checkout source code
+        uses: actions/checkout@v1
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
       - name: build zip
         run: |
           cd scraper
