@@ -1,7 +1,4 @@
 name: deploy to lambda
-permissions:
-  id-token: write
-  contents: read
 on:
   push:
     branches:
@@ -10,6 +7,9 @@ jobs:
   deploy:
     name: deploy lambda zip
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: checkout source code
         uses: actions/checkout@v1
