@@ -15,7 +15,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::***REMOVED***:role/github_actions
+          role-to-assume: arn:aws:iam::${{secrets.AWS_ACCOUNT_NUMBER}}:role/github_actions
           role-session-name: tethys_github_action
           aws-region: us-east-2
       - name: checkout source code
@@ -23,11 +23,11 @@ jobs:
       - name: build docker container
         run: |
           cd scraper
-          aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin ***REMOVED***.dkr.ecr.us-east-2.amazonaws.com
+          aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin ${{secrets.AWS_ACCOUNT_NUMBER}}.dkr.ecr.us-east-2.amazonaws.com
           docker build -t tethys_scraper .
-          docker tag tethys_scraper:latest ***REMOVED***.dkr.ecr.us-east-2.amazonaws.com/tethys_scraper:latest
-          docker push ***REMOVED***.dkr.ecr.us-east-2.amazonaws.com/tethys_scraper:latest
+          docker tag tethys_scraper:latest ${{secrets.AWS_ACCOUNT_NUMBER}}.dkr.ecr.us-east-2.amazonaws.com/tethys_scraper:latest
+          docker push ${{secrets.AWS_ACCOUNT_NUMBER}}.dkr.ecr.us-east-2.amazonaws.com/tethys_scraper:latest
       - name: update lambda function
         run: |
           aws lambda update-function-code --function-name permitScrape \
-          --image-uri ***REMOVED***.dkr.ecr.us-east-2.amazonaws.com/tethys_scraper:latest
+          --image-uri ${{secrets.AWS_ACCOUNT_NUMBER}}.dkr.ecr.us-east-2.amazonaws.com/tethys_scraper:latest
