@@ -1,0 +1,35 @@
+name: deploy to lambda
+permissions:
+  id-token: write
+  contents: read
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    name: deploy lambda zip
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source code
+        uses: actions/checkout@v1
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::***REMOVED***:role/github_actions
+          role-session-name: tethys_github_action
+          aws-region: us-east-2
+      - name: build zip
+        run: |
+          cd scraper
+          pip install -r requirements.txt -t .
+          zip -r9 ../scraper_lambda.zip * -x "bin/*" requirements.txt
+      - name: update lambda
+        uses: appleboy/lambda-action@master
+        with:
+          function_name: permitScrape
+          zip_file: scraper_lambda.zip
