@@ -23,6 +23,7 @@ jobs:
       - name: build docker container
         run: |
           cd scraper
+          aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin ***REMOVED***.dkr.ecr.us-east-2.amazonaws.com
           docker build -t tethys_scraper .
           docker tag tethys_scraper:latest ***REMOVED***.dkr.ecr.us-east-2.amazonaws.com/tethys_scraper:latest
           docker push ***REMOVED***.dkr.ecr.us-east-2.amazonaws.com/tethys_scraper:latest
