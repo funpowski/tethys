@@ -20,13 +20,13 @@ jobs:
           aws-region: us-east-2
       - name: checkout source code
         uses: actions/checkout@v1
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-      - name: build and deploy zip
+      - name: build docker container
         run: |
           cd scraper
-          pip install -r requirements.txt -t .
-          zip -r9 ../scraper_lambda.zip * -x "bin/*" requirements.txt
-          aws lambda update-function-code --function-name permitScrape --zip-file fileb://scraper_lambda.zip
+          docker build -t tethys_scraper
+          docker tag tethys_scraper:latest ***REMOVED***.dkr.ecr.us-east-2.amazonaws.com/tethys_scraper:latest
+          docker push ***REMOVED***.dkr.ecr.us-east-2.amazonaws.com/tethys_scraper:latest
+      - name: update lambda function
+        run: |
+          aws lambda update-function-code --function-name permitScrape \
+          --image-uri ***REMOVED***.dkr.ecr.us-east-2.amazonaws.com/tethys_scraper:latest

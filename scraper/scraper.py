@@ -89,7 +89,7 @@ def get_secret(secret_name, region_name="us-west-2"):
     return json.loads(secret)
 
 
-def run_scraper():
+def handler(event, context):
     # open config
     config = yaml.safe_load(Path("scraper_config.yaml").read_text())
     permits = [Permit.parse_obj(p) for p in config["permits"]]
@@ -123,4 +123,4 @@ def run_scraper():
 
 
 if __name__ == "__main__":
-    run_scraper()
+    handler(None, None)
