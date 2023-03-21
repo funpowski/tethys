@@ -1,0 +1,6 @@
+numpy
+pandas
+pydantic
+boto3
+supabase
+pyyaml

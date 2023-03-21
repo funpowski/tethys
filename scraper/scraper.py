@@ -1,8 +1,25 @@
 import requests
+import logging
+import boto3
+from botocore.exceptions import ClientError
+import json
 import numpy as np
 import json
 import pandas as pd
 import datetime as dt
+from pydantic import BaseModel, StrictBool
+from typing import Optional
+import time
+from supabase import create_client, Client
+from pathlib import Path
+import yaml
+
+
+class Permit(BaseModel):
+    name: str
+    permit_id: int
+    division_id: int
+    by_group_size: Optional[StrictBool] = False
 
 
 class Requester:
@@ -23,10 +40,8 @@ class Requester:
         Make request from rec.gov permit site.
         """
         # need to convert dates to match javascript API
-        # start_date = start_date.strftime('%Y-%m-%dT%H:%M:%SZ')
-        # end_date = end_date.strftime('%Y-%m-%dT%H:%M:%SZ')
         start_time = dt.datetime.today()
-        end_time = start_time + dt.timedelta(days=time_offset)
+        end_time = dt.date(start_time.year, 10, 1)  # assume season ends in Oct
         request_url = "https://www.recreation.gov/api/permits/{}/divisions/{}/availability?start_date={}&end_date={}&commercial_acct={}&is_lottery={}".format(
             permit_id,
             division_id,
@@ -54,3 +69,58 @@ class Requester:
         )
         df["availability_date"] = df["availability_date"].astype(np.datetime64).dt.date
         return df
+
+
+def get_secret(secret_name, region_name="us-west-2"):
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(service_name="secretsmanager", region_name=region_name)
+
+    try:
+        get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+    except ClientError as e:
+        # For a list of exceptions thrown, see
+        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        raise e
+
+    # Decrypts secret using the associated KMS key.
+    secret = get_secret_value_response["SecretString"]
+    return json.loads(secret)
+
+
+def run_scraper():
+    # open config
+    config = yaml.safe_load(Path("scraper_config.yaml").read_text())
+    permits = [Permit.parse_obj(p) for p in config["permits"]]
+
+    # scrape data and combine into common df
+    scrape_df = pd.DataFrame()
+    scrape_time = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+    r = Requester(headers=config["headers"])
+    for permit in permits:
+        logging.info(f"making request for permit {permit.name}...")
+        response_df = r.api_request(permit.permit_id, permit.division_id)
+        response_df["permit_name"] = permit.name
+        response_df["scrape_time"] = scrape_time
+        response_df["availability_date"] = response_df.availability_date.astype(
+            np.datetime64
+        ).dt.strftime("%Y-%m-%d")
+
+        scrape_df = pd.concat([scrape_df, response_df])
+        time.sleep(0.5)  # unsure how good bot protection is so punt
+
+    logging.info(f"authenticating to supabase...")
+    supabase_creds = get_secret("supabase_auth")
+    supabase = create_client(supabase_creds["url"], supabase_creds["key"])
+
+    logging.info(f"writing to supabase...")
+    data, count = (
+        supabase.table("scraped_data")
+        .insert(scrape_df.to_dict(orient="records"))
+        .execute()
+    )
+
+
+if __name__ == "__main__":
+    run_scraper()
