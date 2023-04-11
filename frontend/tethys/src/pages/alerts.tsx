@@ -1,7 +1,11 @@
-import { Title } from "@mantine/core";
+import { Title, Center, Container } from "@mantine/core";
 
 export default function Alerts() {
     return (
-        <Title>Alerts</Title>
+        <Center>
+            <Container size={'sm'}>
+                <Title>Alerts</Title>
+            </Container>
+        </Center>
     )
 }

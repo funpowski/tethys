@@ -1,4 +1,4 @@
-import { AppShell, Navbar, Header, Text, Stack, Title, Container, Divider, Space } from '@mantine/core';
+import { AppShell, Navbar, Header, Text, Stack, Title, Container, Divider, Space, NavLink } from '@mantine/core';
 import { NavbarButton } from './components/navbarButton';
 import { IconAlarm, IconDatabase, IconHome, IconMap, IconUser } from '@tabler/icons-react';
 import { activeTab_s } from './state';
@@ -30,7 +30,7 @@ export default function App() {
       navbar={
         <Navbar width={{ base: 300 }} height={'100vh'} p="xs">
           <Navbar.Section>
-            <Title>
+            <Title onClick={() => setActiveTab(<Home />)} sx={{ cursor: 'pointer' }}>
               🦦 Tethys
             </Title>
           </Navbar.Section>
