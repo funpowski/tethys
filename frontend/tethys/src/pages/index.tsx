@@ -1,7 +1,7 @@
 import { AppShell, Navbar, Header, Text, Stack, Title, Container, Divider, Space, NavLink, UnstyledButton, Group } from '@mantine/core';
 import { NavbarButton } from './components/navbarButton';
 import { IconAlarm, IconDatabase, IconHome, IconMap, IconUser } from '@tabler/icons-react';
-import { activeTab_s } from './state';
+import { activeTab_s, currentUser_s } from './state';
 import Home from './home';
 import { useRef, useState } from 'react';
 import Alerts from './alerts';
@@ -9,6 +9,7 @@ import Account from './account';
 import Data from './data';
 import dynamic from "next/dynamic"
 import { useDisclosure } from '@mantine/hooks';
+import { useAtom } from 'jotai';
 
 const MapWithNoSSR = dynamic(() => import('./riverMap'), {
   ssr: false,
@@ -16,6 +17,7 @@ const MapWithNoSSR = dynamic(() => import('./riverMap'), {
 
 export default function App() {
 
+  const [currentUser, setCurrentUser] = useAtom(currentUser_s)
   const [activeTab, setActiveTab] = useState(<Home />)
   const [loginModalOpen, { open, close }] = useDisclosure(false)
   const buttons = [
@@ -53,7 +55,7 @@ export default function App() {
               <Group >
                 <IconUser />
                 <div>
-                  <Text>Account</Text>
+                  <Text>{currentUser === null ? 'Account' : currentUser.email}</Text>
                 </div>
               </Group>
             </UnstyledButton>
