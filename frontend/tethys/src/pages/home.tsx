@@ -1,27 +1,21 @@
-import { Blockquote, Center, Container, Image, Paper, Space, Text, Title } from "@mantine/core";
+import { Blockquote, Center, Container, Image, Paper, Space, Stack, Text, Title } from "@mantine/core";
 
 export default function Home() {
     return (
         <Center>
             <Container size={'sm'}>
                 <Title>What is it?</Title>
-                <Text>
-                    Tethys is a permit scraper for rec.gov. Lots of people are applying for river permits every year and it is getting harder and harder to get them.
-                </Text>
-                <Space h="md" />
-                <Text>
-                    This project scrapes rec.gov on a regular cadence - it takes "snapshots" of the availability calendar and identifies changes in availability state:
-                </Text>
-                <Space h="md" />
-                <Center>
-                    <Image src='/img/recgov_calendar.png' width={'60%'} />
-                </Center>
-                <Space h="md" />
-                <Text>
-                    When an availability transition is detected it is logged to a database and a slack message is sent to users who set up an alert for the given river.
-                </Text>
-                <Space h="md" />
-
+                <Stack>
+                    <Text>
+                        Tethys is a permit scraper for rec.gov. Lots of people are applying for river permits every year and it is getting harder and harder to get them.
+                    </Text>
+                    <Text>
+                        This project scrapes rec.gov on a regular cadence - it takes "snapshots" of the availability calendar and identifies changes in availability state.
+                    </Text>
+                    <Text>
+                        When an availability transition is detected it is logged to a database and a slack message is sent to users who set up an alert for the given river.
+                    </Text>
+                </Stack>
                 <Space h="lg" />
                 <Title>Is Alerting Publicly Available?</Title>
                 <Text>
@@ -36,7 +30,7 @@ export default function Home() {
                     this is impressive, tell no one
                 </Blockquote>
                 <Blockquote cite="– also My Dad">
-                    You aren't the only person doing this, I wouldn't even bother
+                    There are tons of other people already doing this, I wouldn't even bother
                 </Blockquote>
             </Container >
         </Center >

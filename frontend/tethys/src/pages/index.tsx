@@ -1,4 +1,4 @@
-import { AppShell, Navbar, Header, Text, Stack, Title, Container, Divider, Space, NavLink } from '@mantine/core';
+import { AppShell, Navbar, Header, Text, Stack, Title, Container, Divider, Space, NavLink, UnstyledButton, Group } from '@mantine/core';
 import { NavbarButton } from './components/navbarButton';
 import { IconAlarm, IconDatabase, IconHome, IconMap, IconUser } from '@tabler/icons-react';
 import { activeTab_s } from './state';
@@ -8,6 +8,7 @@ import Alerts from './alerts';
 import Account from './account';
 import Data from './data';
 import dynamic from "next/dynamic"
+import { useDisclosure } from '@mantine/hooks';
 
 const MapWithNoSSR = dynamic(() => import('./riverMap'), {
   ssr: false,
@@ -16,7 +17,7 @@ const MapWithNoSSR = dynamic(() => import('./riverMap'), {
 export default function App() {
 
   const [activeTab, setActiveTab] = useState(<Home />)
-
+  const [loginModalOpen, { open, close }] = useDisclosure(false)
   const buttons = [
     <NavbarButton name={'Home'} icon={<IconHome />} tab={<Home />} setActiveTab={setActiveTab} />,
     <NavbarButton name={'River Map'} icon={<IconMap />} tab={<MapWithNoSSR />} setActiveTab={setActiveTab} />,
@@ -48,7 +49,15 @@ export default function App() {
           <Space h="md" />
 
           <Navbar.Section>
-            <NavbarButton name={'Account'} icon={<IconUser />} tab={<Account />} setActiveTab={setActiveTab} />,
+            <UnstyledButton onClick={open}>
+              <Group >
+                <IconUser />
+                <div>
+                  <Text>Account</Text>
+                </div>
+              </Group>
+            </UnstyledButton>
+            <Account opened={loginModalOpen} close={close} />
           </Navbar.Section>
         </Navbar>}
       styles={(theme) => ({
