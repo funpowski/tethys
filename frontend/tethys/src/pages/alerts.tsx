@@ -50,11 +50,12 @@ export default function Alerts() {
                 console.log(error)
             } else {
                 const alertDateRanges = data.flatMap((r) => ({
-                    startDate: new Date(Date.parse(r.start_date)),
-                    endDate: new Date(Date.parse(r.end_date)),
+                    startDate: r.start_date,
+                    endDate: r.end_date,
                     river: r.river,
                 }))
                 setAlertDateRanges(alertDateRanges)
+                console.log(alertDateRanges)
             }
         }
         getAlertDates()
@@ -66,9 +67,13 @@ export default function Alerts() {
     const addRow = async (dateRange: [Date, Date]) => {
         if (authenticated) {
 
-            const selectedAlerts = selectedRivers.flatMap((r) => ({ startDate: dateRange[0], endDate: dateRange[1], river: r }));
+            const selectedAlerts = selectedRivers.flatMap((r) => ({
+                startDate: dateRange[0].toLocaleDateString('en-US', dateOptions),
+                endDate: dateRange[1].toLocaleDateString('en-US', dateOptions),
+                river: r
+            }));
+            console.log(selectedAlerts)
             const newAlerts = _.differenceWith(selectedAlerts, alertDateRanges, _.isEqual)
-            console.log(newAlerts)
             setAlertDateRanges([...alertDateRanges, ...newAlerts])
             for (const alertDateRange of newAlerts) {
                 const { data, error } = await supabase
@@ -88,10 +93,21 @@ export default function Alerts() {
         }
     };
 
-    const removeRow = (index) => {
+    const removeRow = async (index) => {
         const newAlertDateRanges = alertDateRanges.filter((_, i) => i !== index);
-
         setAlertDateRanges(newAlertDateRanges)
+
+        const deleteAlert = alertDateRanges.filter((_, i) => i === index)[0]
+        const { data, error } = await supabase
+            .from('alerts')
+            .delete()
+            .eq('start_date', deleteAlert.startDate)
+            .eq('end_date', deleteAlert.endDate)
+            .eq('river', deleteAlert.river)
+        if (error) {
+            console.error(error);
+        }
+
     };
 
 
@@ -104,7 +120,11 @@ export default function Alerts() {
                         Select dates on the calendar below to subscribe to alerts for.
                     </Text>
                     <Center>
-                        <DatePicker numberOfColumns={2} type="range" value={dateRange} onChange={setDateRange} />
+                        <DatePicker
+                            numberOfColumns={2}
+                            type="range"
+                            value={dateRange}
+                            onChange={setDateRange} />
                     </Center>
                     <MultiSelect
                         value={selectedRivers}
@@ -128,8 +148,8 @@ export default function Alerts() {
                             {alertDateRanges.map((row, index) => (
                                 <tr key={index}>
                                     <td>{row.river}</td>
-                                    <td>{row.startDate.toLocaleDateString('en-US', dateOptions)}</td>
-                                    <td>{row.endDate.toLocaleDateString('en-US', dateOptions)}</td>
+                                    <td>{row.startDate}</td>
+                                    <td>{row.endDate}</td>
                                     <td>
                                         <ActionIcon onClick={() => removeRow(index)}>
                                             <IconX />
