@@ -120,6 +120,7 @@ def handler(event, context):
         .insert(scrape_df.to_dict(orient="records"))
         .execute()
     )
+    print(data, count)
 
 
 if __name__ == "__main__":
