@@ -55,12 +55,11 @@ export default function Alerts() {
                     river: r.river,
                 }))
                 setAlertDateRanges(alertDateRanges)
-                console.log(alertDateRanges)
             }
         }
         getAlertDates()
 
-    }, [])
+    }, [authenticated])
 
 
 
@@ -135,6 +134,8 @@ export default function Alerts() {
 
                     <Button onClick={() => addRow(dateRange)}>Add Alert</Button>
                     <Divider />
+                    <Title order={3}>Selected Alerts</Title>
+                    <Text>For user {currentUser?.email}</Text>
                     <Table>
                         <thead>
                             <tr>
