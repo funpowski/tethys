@@ -1,5 +1,4 @@
 import requests
-import logging
 import boto3
 from botocore.exceptions import ClientError
 import json
@@ -13,6 +12,11 @@ import time
 from supabase import create_client, Client
 from pathlib import Path
 import yaml
+
+# handle logging
+import logging
+
+logging.getLogger().setLevel(logging.INFO)
 
 
 class Permit(BaseModel):
@@ -41,7 +45,7 @@ class Requester:
         """
         # need to convert dates to match javascript API
         start_time = dt.datetime.today()
-        end_time = dt.date(start_time.year, 10, 1)  # assume season ends in Oct
+        end_time = start_time + dt.timedelta(days=time_offset)
         request_url = "https://www.recreation.gov/api/permits/{}/divisions/{}/availability?start_date={}&end_date={}&commercial_acct={}&is_lottery={}".format(
             permit_id,
             division_id,
@@ -72,7 +76,6 @@ class Requester:
 
 
 def get_secret(secret_name, region_name="us-west-2"):
-
     # Create a Secrets Manager client
     session = boto3.session.Session()
     client = session.client(service_name="secretsmanager", region_name=region_name)
@@ -109,7 +112,9 @@ def handler(event, context):
 
         scrape_df = pd.concat([scrape_df, response_df])
         time.sleep(0.5)  # unsure how good bot protection is so punt
+    logging.info(f"Scraped dataframe size: {scrape_df.shape}")
 
+    # write to supabase
     logging.info(f"authenticating to supabase...")
     supabase_creds = get_secret("supabase_auth")
     supabase = create_client(supabase_creds["url"], supabase_creds["key"])
@@ -120,7 +125,7 @@ def handler(event, context):
         .insert(scrape_df.to_dict(orient="records"))
         .execute()
     )
-    print(data, count)
+    logging.info(f"Supabase response: data={data}, count={count}")
 
 
 if __name__ == "__main__":
