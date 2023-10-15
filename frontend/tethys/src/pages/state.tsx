@@ -1,4 +1,5 @@
 import { atom } from 'jotai'
+import { River } from './riverMap'
 
 interface SupabaseUser {
     id: string
@@ -11,3 +12,4 @@ interface SupabaseUser {
 export const activeTab_s = atom<string>('Home')
 export const currentUser_s = atom<SupabaseUser | null>(null)
 export const authenticated_s = atom<boolean>(false)
+export const activeRiver_s = atom<River | null>(null)

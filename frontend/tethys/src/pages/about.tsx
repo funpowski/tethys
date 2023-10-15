@@ -1,6 +1,6 @@
 import { Blockquote, Center, Container, Image, Paper, Space, Stack, Text, Title } from "@mantine/core";
 
-export default function Home() {
+export default function About() {
     return (
         <Center>
             <Container size={'sm'}>
