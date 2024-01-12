@@ -22,6 +22,7 @@ export interface River {
 const Sidebar = ({ isOpen, onOpen, onClose }) => {
     const [activeRiver, setActiveRiver] = useAtom(activeRiver_s)
     const [sidebarWidth, setSidebarWidth] = useState(500);
+    const [supabase, setSupabase] = useAtom(supabase_s)
 
     const handleMouseDown = (e) => {
         e.preventDefault()
@@ -41,6 +42,19 @@ const Sidebar = ({ isOpen, onOpen, onClose }) => {
         updatedWidth = Math.min(maxWidth, Math.max(minWidth, updatedWidth));
         setSidebarWidth(updatedWidth);
     };
+
+
+    useEffect(() => {
+        const fetchMapData = async () => {
+            await supabase.from('scraped_data').select().eq('permit_name', activeRiver?.name).then((data) => {
+                if (data.data) {
+                    console.log('payload:', data.data)
+                }
+            })
+        }
+
+        fetchMapData()
+    }, [activeRiver])
 
     return (
         <>
@@ -62,7 +76,7 @@ const Sidebar = ({ isOpen, onOpen, onClose }) => {
                     width: '5px',
                     height: 'calc(100vh - 20px)',
                     backgroundColor: '#e0e0e0',
-                    cursor: 'pointer',
+                    cursor: 'ew-resize',
                     position: 'absolute',
                     zIndex: 999,
                     right: sidebarWidth,
@@ -77,11 +91,8 @@ const Sidebar = ({ isOpen, onOpen, onClose }) => {
 };
 
 export default function RiverMap() {
-    const [riverList, setRiverList] = useState<River[]>([])
-    const [supabase, setSupabase] = useAtom(supabase_s)
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [activeRiver, setActiveRiver] = useAtom(activeRiver_s)
-
 
     const openSidebar = () => {
         setIsSidebarOpen(true);
@@ -91,18 +102,6 @@ export default function RiverMap() {
         setIsSidebarOpen(false);
     };
 
-    useEffect(() => {
-        const fetchMapData = async () => {
-            await supabase.from('rivers').select().then((data) => {
-                if (data.data) {
-                    setRiverList(data.data)
-                    console.log(data.data)
-                }
-            })
-        }
-
-        fetchMapData()
-    }, [])
 
     return (
         <>
