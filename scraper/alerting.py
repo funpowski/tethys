@@ -100,13 +100,17 @@ def alert_transitions(
     scrape_df: pd.DataFrame, supabase: Client, river_response: Dict[str, Any]
 ) -> None:
     # get recent transitions from materialized view
-    response = (
-        supabase.table("transitions_v")
-        .select("*")
-        .order("scrape_timestamp", desc=True)
-        .execute()
-    )
-    current_transitions_df = pd.DataFrame.from_dict(response.data)
+    data = []
+    for permit in river_response.data:
+        permit_response = (
+            supabase.table("current_status_c")
+            .select("*")
+            .eq("permit_name", permit["name"])
+            .execute()
+        )
+        data.extend(permit_response.data)
+
+    current_transitions_df = pd.DataFrame.from_dict(data)
 
     # get river information
     river_df = pd.DataFrame.from_dict(river_response.data)
@@ -115,28 +119,26 @@ def alert_transitions(
     user_alert_response = supabase.table("alerts").select("*").execute()
     user_alert_df = pd.DataFrame.from_dict(user_alert_response.data)
 
-    # join with scrape data:
-    #   1. filter current transitions down to previous scrape
-    #   2. join new scraped data on permit date/permit name
-    recent_transitions_df = current_transitions_df[
-        current_transitions_df.scrape_timestamp
-        >= current_transitions_df.scrape_timestamp.max()
-    ].merge(
-        scrape_df[["availability_date", "remaining", "scrape_time", "permit_name"]],
-        left_on=["permit_name", "permit_date"],
-        right_on=["permit_name", "availability_date"],
+    # join with scrape data on permit_name/availability_date
+    comparison_df = (
+        scrape_df.set_index(["permit_name", "availability_date"])
+        .join(
+            current_transitions_df.set_index(["permit_name", "availability_date"])[
+                "remaining"
+            ],
+            rsuffix="_previous",
+        )
+        .dropna()
     )
-
-    # label the transition type
-    recent_transitions_df["transition_type"] = recent_transitions_df.apply(
-        lambda r: detect_transition_type(r.availabile_permits, r.remaining), axis=1
-    )
+    alert_transitions_df = comparison_df[
+        comparison_df.remaining != comparison_df.remaining_previous
+    ].reset_index()
 
     # create the alerts
-    alert_transitions_df = recent_transitions_df[
-        recent_transitions_df.transition_type != "no_change"
-    ]
     if not alert_transitions_df.empty:
+        alert_transitions_df["transition_type"] = alert_transitions_df.apply(
+            lambda r: detect_transition_type(r.remaining_previous, r.remaining), axis=1
+        )
         secret = get_secret("tethys/slack_webhook_url/scraper_all_transitions")
         webhook_url = secret["slack_webhook_url"]
         for _, row in alert_transitions_df.iterrows():
@@ -146,8 +148,8 @@ def alert_transitions(
             # identify any user alerts
             alert_ids = (
                 user_alert_df[
-                    (user_alert_df.start_date <= row.permit_date)
-                    & (user_alert_df.end_date >= row.permit_date)
+                    (user_alert_df.start_date <= row.availability_date)
+                    & (user_alert_df.end_date >= row.availability_date)
                     & (user_alert_df.river == row.permit_name)
                 ]
                 .slack_member_id.unique()
@@ -157,7 +159,7 @@ def alert_transitions(
             # create slack alert
             alert = SlackRiverAlert(
                 river_name=river_info.display_name,
-                availability_date=row.permit_date,
+                availability_date=row.availability_date,
                 scrape_timestamp=row.scrape_time,
                 transition_type=row.transition_type,
                 url=river_info.rec_gov_url,
