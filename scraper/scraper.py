@@ -1,6 +1,4 @@
 import requests
-import boto3
-from botocore.exceptions import ClientError
 import json
 import numpy as np
 import json
@@ -9,9 +7,10 @@ import datetime as dt
 from pydantic import BaseModel, StrictBool
 from typing import Optional
 import time
-from supabase import create_client, Client
-from pathlib import Path
-import yaml
+from supabase import create_client
+from utils import get_secret
+from alerting import alert_transitions
+
 
 # handle logging
 import logging
@@ -75,32 +74,25 @@ class Requester:
         return df
 
 
-def get_secret(secret_name, region_name="us-west-2"):
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(service_name="secretsmanager", region_name=region_name)
-
-    try:
-        get_secret_value_response = client.get_secret_value(SecretId=secret_name)
-    except ClientError as e:
-        # For a list of exceptions thrown, see
-        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
-        raise e
-
-    # Decrypts secret using the associated KMS key.
-    secret = get_secret_value_response["SecretString"]
-    return json.loads(secret)
-
-
 def handler(event, context):
-    # open config
-    config = yaml.safe_load(Path("scraper_config.yaml").read_text())
-    permits = [Permit.parse_obj(p) for p in config["permits"]]
+    # auth to supabase
+    logging.info(f"authenticating to supabase...")
+    supabase_creds = get_secret("supabase_auth")
+    supabase = create_client(supabase_creds["url"], supabase_creds["key"])
+
+    # get river info
+    river_response = supabase.table("rivers").select("*").execute()
+    permits = [Permit(**d) for d in river_response.data]
+
+    # define scraper headers
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36"
+    }
 
     # scrape data and combine into common df
     scrape_df = pd.DataFrame()
-    scrape_time = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-    r = Requester(headers=config["headers"])
+    scrape_time = dt.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
+    r = Requester(headers=headers)
     for permit in permits:
         logging.info(f"making request for permit {permit.name}...")
         response_df = r.api_request(permit.permit_id, permit.division_id)
@@ -114,11 +106,10 @@ def handler(event, context):
         time.sleep(0.5)  # unsure how good bot protection is so punt
     logging.info(f"Scraped dataframe size: {scrape_df.shape}")
 
-    # write to supabase
-    logging.info(f"authenticating to supabase...")
-    supabase_creds = get_secret("supabase_auth")
-    supabase = create_client(supabase_creds["url"], supabase_creds["key"])
+    # issue slack alerts as needed
+    alert_transitions(scrape_df, supabase, river_response)
 
+    # write to supabase
     logging.info(f"writing to supabase...")
     data, count = (
         supabase.table("scraped_data")

@@ -1,15 +1,18 @@
 import { AppShell, Navbar, Header, Text, Stack, Title, Container, Divider, Space, NavLink, UnstyledButton, Group } from '@mantine/core';
 import { NavbarButton } from './components/navbarButton';
-import { IconAlarm, IconDatabase, IconHome, IconMap, IconUser } from '@tabler/icons-react';
+import { IconAlarm, IconDatabase, IconHelpCircle, IconMap, IconUser } from '@tabler/icons-react';
 import { activeTab_s, currentUser_s } from './state';
-import Home from './home';
-import { useRef, useState } from 'react';
+import About from './about';
+import { useEffect, useRef, useState } from 'react';
 import Alerts from './alerts';
 import Account from './account';
-import Data from './data';
+import DataContainer from './data';
 import dynamic from "next/dynamic"
 import { useDisclosure } from '@mantine/hooks';
 import { useAtom } from 'jotai';
+import RiverMap from './riverMap';
+import { supabase_s } from "./_app"
+import { riverList_s } from "./state"
 
 const MapWithNoSSR = dynamic(() => import('./riverMap'), {
   ssr: false,
@@ -18,55 +21,75 @@ const MapWithNoSSR = dynamic(() => import('./riverMap'), {
 export default function App() {
 
   const [currentUser, setCurrentUser] = useAtom(currentUser_s)
-  const [activeTab, setActiveTab] = useState(<Home />)
+  const [activeTab, setActiveTab] = useState(<MapWithNoSSR />)
   const [loginModalOpen, { open, close }] = useDisclosure(false)
+  const [supabase, setSupabase] = useAtom(supabase_s)
+  const [riverList, setRiverList] = useAtom(riverList_s)
+
   const buttons = [
-    <NavbarButton name={'Home'} icon={<IconHome />} tab={<Home />} setActiveTab={setActiveTab} />,
     <NavbarButton name={'River Map'} icon={<IconMap />} tab={<MapWithNoSSR />} setActiveTab={setActiveTab} />,
-    <NavbarButton name={'Data'} icon={<IconDatabase />} tab={<Data />} setActiveTab={setActiveTab} />,
+    <NavbarButton name={'Data'} icon={<IconDatabase />} tab={<DataContainer />} setActiveTab={setActiveTab} />,
     <NavbarButton name={'Alerts'} icon={<IconAlarm />} tab={<Alerts />} setActiveTab={setActiveTab} />,
+    <NavbarButton name={'About'} icon={<IconHelpCircle />} tab={<About />} setActiveTab={setActiveTab} />,
   ]
 
+  useEffect(() => {
+    const fetchMapData = async () => {
+      await supabase.from('rivers').select().then((data) => {
+        if (data.data) {
+          console.log('rivers data', data.data)
+          setRiverList(data.data)
+        }
+      })
+    }
+
+    fetchMapData()
+  }, [])
+
+
   return (
-    <AppShell
-      padding="md"
-      navbar={
-        <Navbar width={{ base: 300 }} height={'100vh'} p="xs">
-          <Navbar.Section>
-            <Title onClick={() => setActiveTab(<Home />)} sx={{ cursor: 'pointer' }}>
-              🦦 Tethys
-            </Title>
-          </Navbar.Section>
+    <>
 
-          <Space h="md" />
-          <Divider />
+      <AppShell
+        padding="md"
+        navbar={
+          <Navbar width={{ base: 300 }} height={'100vh'} p="xs">
+            <Navbar.Section>
+              <Title onClick={() => setActiveTab(<About />)} sx={{ cursor: 'pointer' }}>
+                🦦 Tethys
+              </Title>
+            </Navbar.Section>
 
-          <Navbar.Section grow mt="md">
-            <Stack>
-              {...buttons}
-            </Stack>
-          </Navbar.Section>
+            <Space h="md" />
+            <Divider />
 
-          <Divider />
-          <Space h="md" />
+            <Navbar.Section grow mt="md">
+              <Stack>
+                {...buttons}
+              </Stack>
+            </Navbar.Section>
 
-          <Navbar.Section>
-            <UnstyledButton onClick={open}>
-              <Group >
-                <IconUser />
-                <div>
-                  <Text>{currentUser === null ? 'Account' : currentUser.email}</Text>
-                </div>
-              </Group>
-            </UnstyledButton>
-            <Account opened={loginModalOpen} close={close} />
-          </Navbar.Section>
-        </Navbar>}
-      styles={(theme) => ({
-        main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] },
-      })}
-    >
-      {activeTab}
-    </AppShell>
+            <Divider />
+            <Space h="md" />
+
+            <Navbar.Section>
+              <UnstyledButton onClick={open}>
+                <Group >
+                  <IconUser />
+                  <div>
+                    <Text>{currentUser === null ? 'Account' : currentUser.email}</Text>
+                  </div>
+                </Group>
+              </UnstyledButton>
+              <Account opened={loginModalOpen} close={close} />
+            </Navbar.Section>
+          </Navbar>}
+        styles={(theme) => ({
+          main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] },
+        })}
+      >
+        {activeTab}
+      </AppShell>
+    </>
   );
 }

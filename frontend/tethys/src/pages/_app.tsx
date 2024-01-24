@@ -6,7 +6,6 @@ import { createClient } from '@supabase/supabase-js'
 import { atom, useAtom } from 'jotai';
 
 
-
 export const supabase_s = atom(createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_API_KEY))
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
@@ -30,6 +29,7 @@ export default function App(props: AppProps) {
       >
         <Component {...pageProps} />
       </MantineProvider>
+
     </>
   );
 }
