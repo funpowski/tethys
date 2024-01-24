@@ -25,7 +25,8 @@ class SlackRiverAlert(BaseModel):
 
     def _emoji_map(self, transition_type: str) -> str:
         neutral_list = [
-            "🌞            ""🍄",
+            "🌞",
+            "🍄",
             "🙈",
             "🤷‍",
             "👽",
@@ -41,7 +42,8 @@ class SlackRiverAlert(BaseModel):
             "🚨",
             "😈",
             "🎂",
-            "🔥           ""🥳",
+            "🔥",
+            "🥳",
             "🌟",
         ]
         pretty_dict = {

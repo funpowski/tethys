@@ -4,12 +4,12 @@ import numpy as np
 import json
 import pandas as pd
 import datetime as dt
+from alerting import alert_transitions
 from pydantic import BaseModel, StrictBool
 from typing import Optional
 import time
 from supabase import create_client
 from utils import get_secret
-from alerting import alert_transitions
 
 
 # handle logging
