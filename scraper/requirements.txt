@@ -1,6 +1,6 @@
 numpy==1.22.3
 pandas==1.4.3
-pydantic==1.10.6
+pydantic==1.10.8
 boto3==1.21.21
 supabase==1.0.2
 pyyaml==6.0
