@@ -3,7 +3,7 @@ import { NavbarButton } from './components/navbarButton';
 import { IconAlarm, IconDatabase, IconHelpCircle, IconMap, IconUser } from '@tabler/icons-react';
 import { activeTab_s, currentUser_s } from './state';
 import About from './about';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Alerts from './alerts';
 import Account from './account';
 import DataContainer from './data';
@@ -11,6 +11,8 @@ import dynamic from "next/dynamic"
 import { useDisclosure } from '@mantine/hooks';
 import { useAtom } from 'jotai';
 import RiverMap from './riverMap';
+import { supabase_s } from "./_app"
+import { riverList_s } from "./state"
 
 const MapWithNoSSR = dynamic(() => import('./riverMap'), {
   ssr: false,
@@ -21,12 +23,29 @@ export default function App() {
   const [currentUser, setCurrentUser] = useAtom(currentUser_s)
   const [activeTab, setActiveTab] = useState(<MapWithNoSSR />)
   const [loginModalOpen, { open, close }] = useDisclosure(false)
+  const [supabase, setSupabase] = useAtom(supabase_s)
+  const [riverList, setRiverList] = useAtom(riverList_s)
+
   const buttons = [
     <NavbarButton name={'River Map'} icon={<IconMap />} tab={<MapWithNoSSR />} setActiveTab={setActiveTab} />,
     <NavbarButton name={'Data'} icon={<IconDatabase />} tab={<DataContainer />} setActiveTab={setActiveTab} />,
     <NavbarButton name={'Alerts'} icon={<IconAlarm />} tab={<Alerts />} setActiveTab={setActiveTab} />,
     <NavbarButton name={'About'} icon={<IconHelpCircle />} tab={<About />} setActiveTab={setActiveTab} />,
   ]
+
+  useEffect(() => {
+    const fetchMapData = async () => {
+      await supabase.from('rivers').select().then((data) => {
+        if (data.data) {
+          console.log('rivers data', data.data)
+          setRiverList(data.data)
+        }
+      })
+    }
+
+    fetchMapData()
+  }, [])
+
 
   return (
     <>

@@ -9,6 +9,7 @@ import { supabase_s } from "./_app";
 import { activeRiver_s } from "./state";
 import { GeoJSON } from "react-leaflet";
 import ReactDOMServer from 'react-dom/server';
+import { riverList_s } from "./state"
 
 export interface River {
     name: string
@@ -93,6 +94,7 @@ const Sidebar = ({ isOpen, onOpen, onClose }) => {
 export default function RiverMap() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [activeRiver, setActiveRiver] = useAtom(activeRiver_s)
+    const [riverList, setRiverList] = useAtom(riverList_s)
 
     const openSidebar = () => {
         setIsSidebarOpen(true);
@@ -113,7 +115,7 @@ export default function RiverMap() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 {
-                    riverList.map((river) => {
+                    riverList?.map((river) => {
                         const popupContent = (
                             <>
                                 <h2>{river.display_name}</h2>
