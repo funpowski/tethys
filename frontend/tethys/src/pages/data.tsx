@@ -29,7 +29,7 @@ export default function DataContainer() {
 
     const loadMoreData = async () => {
         const minScrapeTimestamp = transitions.reduce((prev, curr) => prev.scrape_timestamp < curr.scrape_timestamp ? prev : curr).scrape_timestamp;
-        await fetchTransitionData(supabase, minScrapeTimestamp.toISOString().split('T')[0]).then((moreTransitions: Transition[]) => {
+        await fetchTransitionData(supabase, minScrapeTimestamp.toString()).then((moreTransitions: Transition[]) => {
             const mergedArrays = [... new Set([...moreTransitions, ...transitions])]
             mergedArrays.sort(function (a, b) {
                 return new Date(b.scrape_timestamp).valueOf() - new Date(a.scrape_timestamp).valueOf();
@@ -137,11 +137,11 @@ export default function DataContainer() {
                                         <Table.Tr key={index}>
                                             <Table.Td>{index + 1}</Table.Td>
                                             <Table.Td>{row.permit_name}</Table.Td>
-                                            <Table.Td>{row.permit_date.toISOString().split('T')[0]}</Table.Td>
+                                            <Table.Td>{row.permit_date.toString()}</Table.Td>
                                             <Table.Td>{row.total_permits}</Table.Td>
                                             <Table.Td>{row.availabile_permits}</Table.Td>
                                             <Table.Td>{row.transition_type}</Table.Td>
-                                            <Table.Td>{row.scrape_timestamp.toISOString()}</Table.Td>
+                                            <Table.Td>{row.scrape_timestamp.toString()}</Table.Td>
                                         </Table.Tr>
                                     ))}
                                 </Table.Tbody>

@@ -138,8 +138,8 @@ export default function Alerts() {
                                     {alertDateRanges?.map((row, index) => (
                                         <Table.Tr key={index}>
                                             <Table.Td align="left">{row.river}</Table.Td>
-                                            <Table.Td align="left">{row.startDate.toISOString().split('T')[0]}</Table.Td>
-                                            <Table.Td align="left">{row.endDate.toISOString().split('T')[0]}</Table.Td>
+                                            <Table.Td align="left">{row.startDate.toString()}</Table.Td>
+                                            <Table.Td align="left">{row.endDate.toString()}</Table.Td>
                                             <Table.Td align="center">
                                                 <ActionIcon color="red" variant="outline" onClick={() => removeRow(index)}>
                                                     <IconX />

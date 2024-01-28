@@ -205,7 +205,7 @@ const Sidebar = ({ isOpen, onOpen, onClose }) => {
                             <List>
                                 {alertDateRanges?.filter((alert) => alert.river === activeRiver?.name)
                                     .map((alert) => (
-                                        <List.Item key={`${alert.river}-${alert.startDate}-${alert.endDate}`}>{alert.startDate.toISOString().split('T')[0]} - {alert.endDate.toISOString().split('T')[0]}</List.Item>
+                                        <List.Item key={`${alert.river}-${alert.startDate}-${alert.endDate}`}>{alert.startDate.toString()} - {alert.endDate.toString()}</List.Item>
                                     ))
 
                                 }
