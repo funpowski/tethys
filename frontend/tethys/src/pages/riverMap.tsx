@@ -80,7 +80,7 @@ const Sidebar = ({ isOpen, onOpen, onClose }) => {
                         color: 'var(--mantine-color-white)',
                     },
                 }
-            } else if (availabilityStatus?.availability_ratio > 0) {
+            } else if (availabilityStatus?.availability_ratio !== undefined && availabilityStatus?.availability_ratio > 0) {
                 return {
                     style: {
                         backgroundColor: `rgba(60, 179, 113, ${availabilityStatus?.availability_ratio})`,
@@ -193,7 +193,7 @@ const Sidebar = ({ isOpen, onOpen, onClose }) => {
                             <List>
                                 {alertDateRanges?.filter((alert) => alert.river === activeRiver?.name)
                                     .map((alert) => (
-                                        <List.Item>{alert.startDate} - {alert.endDate}</List.Item>
+                                        <List.Item key={`${alert.river}-${alert.startDate}-${alert.endDate}`}>{alert.startDate.toISOString().split('T')[0]} - {alert.endDate.toISOString().split('T')[0]}</List.Item>
                                     ))
 
                                 }
@@ -289,7 +289,7 @@ export default function RiverMap() {
                         riverList?.map((river) => {
                             return <GeoJSON
                                 key={river.name}
-                                data={JSON.parse(river?.geometry)}
+                                data={JSON.parse(river?.geometry as any)}
                                 onEachFeature={(feature, leafletLayer) => {
                                     leafletLayer.on("click", (event) => {
                                         openSidebar();

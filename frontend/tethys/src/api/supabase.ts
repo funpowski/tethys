@@ -30,7 +30,7 @@ export async function fetchAlertDatesByUser(supabase: any, userId: string): Prom
         .eq('user_id', userId)
         .then((response: SupabaseRespone) => {
             if (response.data) {
-                const alertDateRanges = response.data.flatMap((r: AlertDateRange) => ({
+                const alertDateRanges = response.data.map((r: any) => ({
                     startDate: r.start_date,
                     endDate: r.end_date,
                     river: r.river,

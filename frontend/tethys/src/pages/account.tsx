@@ -1,10 +1,12 @@
-import { Text, Center, Container, Title, Modal, Tabs, TextInput, Checkbox, Group, Button, PasswordInput, Box, Space } from "@mantine/core"
+import { Text, Center, Container, Title, Modal, Tabs, TextInput, Checkbox, Group, Button, PasswordInput, Box, Space, rem } from "@mantine/core"
 import { Form, useForm } from "@mantine/form"
 import { IconUser, IconUserPlus } from "@tabler/icons-react"
 import { useAtom } from "jotai"
 import { useState } from "react"
 import { supabase_s } from "./_app"
 import { authenticated_s, currentUser_s } from "./state"
+import { SupabaseUser } from "./state"
+import { error } from "console"
 
 export default function Account() {
 
@@ -18,27 +20,25 @@ export default function Account() {
     }
 
     async function supabaseLogin(loginValues: LoginForm) {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        await supabase?.auth.signInWithPassword({
             email: loginValues.email,
             password: loginValues.password,
-        })
-        if (error !== null) {
-            alert(error)
-        } else {
+        }).then((data) => {
             setAuthenticated(true)
-            setCurrentUser(data.user)
-        }
+            setCurrentUser(data.data.user as unknown as SupabaseUser)
+        }).catch((error) => {
+            alert(error)
+        })
         close()
     }
 
     async function supabaseLogout() {
-        const { error } = await supabase.auth.signOut()
-        if (error !== null) {
-            alert(error)
-        } else {
+        await supabase?.auth.signOut().then((response) => {
             setAuthenticated(false)
             setCurrentUser(null)
-        }
+        }).catch((error) => {
+            alert(error)
+        })
         close()
 
     }
@@ -54,11 +54,13 @@ export default function Account() {
         },
     });
 
+    const iconStyle = { width: rem(15), height: rem(15) };
+
     return (
         <Center>
             <Container size={'xs'}>
                 <Box style={{
-                    width: '40vw'
+                    width: '30vw'
                 }}>
 
                     <Title>Account</Title>
@@ -66,8 +68,8 @@ export default function Account() {
                     {authenticated === false ?
                         <Tabs defaultValue="login">
                             <Tabs.List>
-                                <Tabs.Tab value="login" icon={<IconUser size="0.8rem" />}>Login</Tabs.Tab>
-                                <Tabs.Tab value="create" icon={<IconUserPlus size="0.8rem" />}>Create New</Tabs.Tab>
+                                <Tabs.Tab value="login" leftSection={<IconUser style={iconStyle} />}>Login</Tabs.Tab>
+                                <Tabs.Tab value="create" leftSection={<IconUserPlus style={iconStyle} />}>Create New</Tabs.Tab>
                             </Tabs.List>
 
                             <Tabs.Panel value="login" pt="xs">
@@ -85,7 +87,7 @@ export default function Account() {
                                         {...form.getInputProps('password')}
                                     />
 
-                                    <Group position="right" mt="md">
+                                    <Group mt="md">
                                         <Button type="submit">Submit</Button>
                                     </Group>
                                 </form>

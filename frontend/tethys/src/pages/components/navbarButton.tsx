@@ -1,5 +1,4 @@
 import { Avatar, Container, Group, Text, UnstyledButton } from "@mantine/core";
-import { DisclosureActions } from '@mantine/hooks';
 import type { Icon } from "@tabler/icons-react";
 import React, { useState } from "react";
 import { activeTab_s } from "../state";
@@ -32,7 +31,7 @@ export function NavbarButton({ name, icon, tab, onSelect, isSelected }: NavbarBu
     return (
         <UnstyledButton
             onClick={() => {
-                setActiveTab(tab);
+                setActiveTab(tab as unknown as React.ReactNode);
                 onSelect(name);
 
             }}

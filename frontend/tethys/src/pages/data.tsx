@@ -22,21 +22,17 @@ export default function DataContainer() {
     const [supabase, setSupabase] = useAtom(supabase_s)
     const [transitions, setTransitions] = useState<Transition[]>([]);
     const [displayTransitions, setDisplayTransitions] = useState<Transition[]>([]);
-    const [riverNameFilter, setRiverNameFilter] = useState<string[]>([]);
+    const [riverNameFilter, setRiverNameFilter] = useState<string[] | undefined>([]);
     const [transitionTypeFilter, setTransitionTypeFilter] = useState<string[]>([]);
     const [permitDateFilter, setPermitDateFilter] = useState<[Date | null, Date | null]>([null, null]);
     const [filtersOpened, { toggle }] = useDisclosure(false);
 
-
-
-
-
     const loadMoreData = async () => {
         const minScrapeTimestamp = transitions.reduce((prev, curr) => prev.scrape_timestamp < curr.scrape_timestamp ? prev : curr).scrape_timestamp;
-        await fetchTransitionData(supabase, minScrapeTimestamp).then((moreTransitions: Transition[]) => {
+        await fetchTransitionData(supabase, minScrapeTimestamp.toISOString().split('T')[0]).then((moreTransitions: Transition[]) => {
             const mergedArrays = [... new Set([...moreTransitions, ...transitions])]
             mergedArrays.sort(function (a, b) {
-                return new Date(b.scrape_timestamp) - new Date(a.scrape_timestamp);
+                return new Date(b.scrape_timestamp).valueOf() - new Date(a.scrape_timestamp).valueOf();
             });
             setTransitions(mergedArrays)
             setDisplayTransitions(mergedArrays)
@@ -59,6 +55,7 @@ export default function DataContainer() {
         const updateDisplayTransitions = () => {
             const [minDateFilter, maxDateFilter] = permitDateFilter
             const filteredTransitions = transitions?.filter((t) =>
+                riverNameFilter !== undefined &&
                 riverNameFilter.includes(t.permit_name) &&
                 transitionTypeFilter.includes(t.transition_type) &&
                 (
@@ -140,11 +137,11 @@ export default function DataContainer() {
                                         <Table.Tr key={index}>
                                             <Table.Td>{index + 1}</Table.Td>
                                             <Table.Td>{row.permit_name}</Table.Td>
-                                            <Table.Td>{row.permit_date}</Table.Td>
+                                            <Table.Td>{row.permit_date.toISOString().split('T')[0]}</Table.Td>
                                             <Table.Td>{row.total_permits}</Table.Td>
                                             <Table.Td>{row.availabile_permits}</Table.Td>
                                             <Table.Td>{row.transition_type}</Table.Td>
-                                            <Table.Td>{row.scrape_timestamp}</Table.Td>
+                                            <Table.Td>{row.scrape_timestamp.toISOString()}</Table.Td>
                                         </Table.Tr>
                                     ))}
                                 </Table.Tbody>

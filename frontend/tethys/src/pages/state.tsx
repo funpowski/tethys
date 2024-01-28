@@ -7,7 +7,7 @@ const MapWithNoSSR = dynamic(() => import('./riverMap'), {
     ssr: false,
 });
 
-interface SupabaseUser {
+export interface SupabaseUser {
     id: string
     email: string
     access_token: string
@@ -15,9 +15,9 @@ interface SupabaseUser {
     expires_in: number
 }
 
-export const activeTab_s = atom<React.ElementRef<any>>(<MapWithNoSSR />)
+export const activeTab_s = atom<React.ReactNode>(<MapWithNoSSR />)
 export const currentUser_s = atom<SupabaseUser | null>(null)
 export const authenticated_s = atom<boolean>(false)
 export const activeRiver_s = atom<River | null>(null)
-export const riverList_s = atom<[River] | null>(null)
-export const userAlerts_s = atom<[AlertDateRange] | null>(null)
+export const riverList_s = atom<River[] | null>(null)
+export const userAlerts_s = atom<AlertDateRange[] | null>(null)

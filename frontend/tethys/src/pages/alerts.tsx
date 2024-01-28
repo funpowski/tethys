@@ -49,27 +49,28 @@ export default function Alerts() {
     }, [authenticated])
 
 
-    const addRow = async (dateRange: [Date, Date]) => {
+    const addRow = async (dateRange: [Date | null, Date | null]) => {
         if (authenticated) {
 
-            const selectedAlerts = selectedRivers.flatMap((r) => ({
-                startDate: dateRange[0].toLocaleDateString('en-US', dateOptions),
-                endDate: dateRange[1].toLocaleDateString('en-US', dateOptions),
-                river: r
-            }));
-            const newAlerts = _.differenceWith(selectedAlerts, alertDateRanges, _.isEqual)
-            setAlertDateRanges([...alertDateRanges, ...newAlerts])
-            for (const alertDateRange of newAlerts) {
-                const { data, error } = await supabase
-                    .from('alerts')
-                    .insert({
-                        start_date: alertDateRange.startDate,
-                        end_date: alertDateRange.endDate,
-                        river: alertDateRange.river,
-                        user_id: currentUser?.id,
-                    })
-                if (error) {
-                    console.error(error);
+            const [startDate, endDate] = dateRange;
+            if (startDate !== null && endDate !== null) {
+                const selectedAlerts = selectedRivers.flatMap((r) => ({
+                    startDate: startDate.toISOString().split('T')[0],
+                    endDate: endDate.toISOString().split('T')[0],
+                    river: r
+                }));
+                const newAlerts = _.differenceWith(selectedAlerts, alertDateRanges, _.isEqual)
+                if (alertDateRanges !== null) {
+                    setAlertDateRanges([...alertDateRanges, ...newAlerts])
+                }
+                for (const alertDateRange of newAlerts) {
+                    await supabase?.from('alerts')
+                        .insert({
+                            start_date: alertDateRange.startDate,
+                            end_date: alertDateRange.endDate,
+                            river: alertDateRange.river,
+                            user_id: currentUser?.id,
+                        })
                 }
             }
         } else {
@@ -77,19 +78,17 @@ export default function Alerts() {
         }
     };
 
-    const removeRow = async (index) => {
-        const newAlertDateRanges = alertDateRanges.filter((_, i) => i !== index);
-        setAlertDateRanges(newAlertDateRanges)
+    const removeRow = async (index: number) => {
+        if (alertDateRanges !== null) {
+            const newAlertDateRanges = alertDateRanges.filter((_, i) => i !== index);
+            setAlertDateRanges(newAlertDateRanges)
 
-        const deleteAlert = alertDateRanges.filter((_, i) => i === index)[0]
-        const { data, error } = await supabase
-            .from('alerts')
-            .delete()
-            .eq('start_date', deleteAlert.startDate)
-            .eq('end_date', deleteAlert.endDate)
-            .eq('river', deleteAlert.river)
-        if (error) {
-            console.error(error);
+            const deleteAlert = alertDateRanges.filter((_, i) => i === index)[0]
+            await supabase?.from('alerts')
+                .delete()
+                .eq('start_date', deleteAlert.startDate)
+                .eq('end_date', deleteAlert.endDate)
+                .eq('river', deleteAlert.river)
         }
 
     };
@@ -116,7 +115,9 @@ export default function Alerts() {
                         onChange={setDateRange}
                     />
 
-                    <Button onClick={() => addRow(dateRange)}>Add Alert</Button>
+                    <Button onClick={() => {
+                        addRow(dateRange)
+                    }}>Add Alert</Button>
                     <Space my={'md'} />
                     <Group>
                         <Title order={3}>Selected Alerts</Title>
@@ -138,8 +139,8 @@ export default function Alerts() {
                                     {alertDateRanges?.map((row, index) => (
                                         <Table.Tr key={index}>
                                             <Table.Td align="left">{row.river}</Table.Td>
-                                            <Table.Td align="left">{row.startDate}</Table.Td>
-                                            <Table.Td align="left">{row.endDate}</Table.Td>
+                                            <Table.Td align="left">{row.startDate.toISOString().split('T')[0]}</Table.Td>
+                                            <Table.Td align="left">{row.endDate.toISOString().split('T')[0]}</Table.Td>
                                             <Table.Td align="center">
                                                 <ActionIcon color="red" variant="outline" onClick={() => removeRow(index)}>
                                                     <IconX />
