@@ -64,7 +64,7 @@ export async function fetchTransitionData(
 
 export async function fetchCurrentStatus(supabase: any, river: River): Promise<RiverPermitStatus[]> {
     return await supabase
-        .from('current_status_c')
+        .from('current_status_v')
         .select()
         .eq('permit_name', river.name)
         .then((response: SupabaseRespone) => {
