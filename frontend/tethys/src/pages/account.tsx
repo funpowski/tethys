@@ -1,4 +1,4 @@
-import { Text, Center, Container, Title, Modal, Tabs, TextInput, Checkbox, Group, Button, PasswordInput } from "@mantine/core"
+import { Text, Center, Container, Title, Modal, Tabs, TextInput, Checkbox, Group, Button, PasswordInput, Box, Space } from "@mantine/core"
 import { Form, useForm } from "@mantine/form"
 import { IconUser, IconUserPlus } from "@tabler/icons-react"
 import { useAtom } from "jotai"
@@ -6,7 +6,7 @@ import { useState } from "react"
 import { supabase_s } from "./_app"
 import { authenticated_s, currentUser_s } from "./state"
 
-export default function Account({ opened, close }) {
+export default function Account() {
 
     const [supabase, setSupabase] = useAtom(supabase_s)
     const [currentUser, setCurrentUser] = useAtom(currentUser_s)
@@ -55,48 +55,55 @@ export default function Account({ opened, close }) {
     });
 
     return (
-        <Modal title={<Title order={3}>Authentication</Title>} opened={opened} onClose={close}>
-            {authenticated === false ?
-                <Tabs defaultValue="login">
-                    <Tabs.List>
-                        <Tabs.Tab value="login" icon={<IconUser size="0.8rem" />}>Login</Tabs.Tab>
-                        <Tabs.Tab value="create" icon={<IconUserPlus size="0.8rem" />}>Create New</Tabs.Tab>
-                    </Tabs.List>
+        <Center>
+            <Container size={'xs'}>
+                <Box style={{
+                    width: '40vw'
+                }}>
 
-                    <Tabs.Panel value="login" pt="xs">
-                        <form onSubmit={form.onSubmit((values) => supabaseLogin(values))}>
-                            <TextInput
-                                withAsterisk
-                                label="Email"
-                                placeholder="your@email.com"
-                                {...form.getInputProps('email')}
-                            />
-                            <PasswordInput
-                                placeholder="Password"
-                                label="Password"
-                                withAsterisk
-                                {...form.getInputProps('password')}
-                            />
+                    <Title>Account</Title>
+                    <Space my={'md'} />
+                    {authenticated === false ?
+                        <Tabs defaultValue="login">
+                            <Tabs.List>
+                                <Tabs.Tab value="login" icon={<IconUser size="0.8rem" />}>Login</Tabs.Tab>
+                                <Tabs.Tab value="create" icon={<IconUserPlus size="0.8rem" />}>Create New</Tabs.Tab>
+                            </Tabs.List>
 
-                            <Group position="right" mt="md">
-                                <Button type="submit">Submit</Button>
-                            </Group>
-                        </form>
-                    </Tabs.Panel>
+                            <Tabs.Panel value="login" pt="xs">
+                                <form onSubmit={form.onSubmit((values) => supabaseLogin(values))}>
+                                    <TextInput
+                                        withAsterisk
+                                        label="Email"
+                                        placeholder="your@email.com"
+                                        {...form.getInputProps('email')}
+                                    />
+                                    <PasswordInput
+                                        placeholder="Password"
+                                        label="Password"
+                                        withAsterisk
+                                        {...form.getInputProps('password')}
+                                    />
 
-                    <Tabs.Panel value="create" pt="xs">
-                        <Text>Coming soon...</Text>
-                        <Text fs="italic">(Contact Rio for account creation)</Text>
-                    </Tabs.Panel>
-                </Tabs>
-                :
-                <Tabs defaultValue='logout'>
-                    <Tabs.Panel value="logout" pt="xs">
-                        <Button onClick={() => supabaseLogout()}>Logout</Button>
-                    </Tabs.Panel>
-                </Tabs>
-            }
-        </Modal>
+                                    <Group position="right" mt="md">
+                                        <Button type="submit">Submit</Button>
+                                    </Group>
+                                </form>
+                            </Tabs.Panel>
 
+                            <Tabs.Panel value="create" pt="xs">
+                                <Text fs="italic">(Not enabled currently...)</Text>
+                            </Tabs.Panel>
+                        </Tabs>
+                        :
+                        <Tabs defaultValue='logout'>
+                            <Tabs.Panel value="logout" pt="xs">
+                                <Button onClick={() => supabaseLogout()}>Logout</Button>
+                            </Tabs.Panel>
+                        </Tabs>
+                    }
+                </Box>
+            </Container>
+        </Center >
     )
 }
