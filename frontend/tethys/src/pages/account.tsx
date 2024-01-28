@@ -27,7 +27,6 @@ export default function Account() {
         }).catch((error) => {
             alert(error)
         })
-        close()
     }
 
     async function supabaseLogout() {
@@ -37,7 +36,6 @@ export default function Account() {
         }).catch((error) => {
             alert(error)
         })
-        close()
 
     }
 
