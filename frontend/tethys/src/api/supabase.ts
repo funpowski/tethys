@@ -34,6 +34,7 @@ export async function fetchAlertDatesByUser(supabase: any, userId: string): Prom
                     startDate: r.start_date,
                     endDate: r.end_date,
                     river: r.river,
+                    slack_member_id: r.slack_member_id
                 }))
                 return alertDateRanges
             } else {

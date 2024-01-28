@@ -5,6 +5,7 @@ import { useAtom } from "jotai"
 import { supabase_s } from "./_app"
 import { authenticated_s, currentUser_s } from "../state"
 import { SupabaseUser } from "../state"
+import { notifications } from '@mantine/notifications';
 
 export default function Account() {
 
@@ -24,6 +25,10 @@ export default function Account() {
         }).then((data) => {
             setAuthenticated(true)
             setCurrentUser(data.data.user as unknown as SupabaseUser)
+            notifications.show({
+                title: 'Login Successful!',
+                message: `Logged in as ${data.data.user?.email}.`,
+            })
         }).catch((error) => {
             alert(error)
         })
@@ -33,6 +38,10 @@ export default function Account() {
         await supabase?.auth.signOut().then((response) => {
             setAuthenticated(false)
             setCurrentUser(null)
+            notifications.show({
+                title: 'Logout Successful!',
+                message: `See you later.`,
+            })
         }).catch((error) => {
             alert(error)
         })

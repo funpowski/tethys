@@ -5,6 +5,8 @@ import { theme } from "../theme";
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { atom, useAtom } from 'jotai';
 import '@mantine/dates/styles.css';
+import '@mantine/notifications/styles.css';
+import { Notifications } from '@mantine/notifications';
 import Script from 'next/script'
 
 
@@ -20,6 +22,7 @@ export const supabase_s = atom(supabaseClient);
 export default function App({ Component, pageProps }: any) {
   return (
     <MantineProvider theme={theme}>
+      <Notifications />
       <Head>
         <title>Tethys</title>
         <meta

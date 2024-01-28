@@ -1,4 +1,4 @@
-import { Title, Center, Container, Text, Stack, Group, Button, Divider, Table, ActionIcon, MultiSelect, Code, Space } from "@mantine/core";
+import { Title, Center, Container, Text, Stack, Group, Button, Divider, Table, ActionIcon, MultiSelect, Code, Space, Checkbox, Switch, TextInput } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -13,6 +13,7 @@ export interface AlertDateRange {
     startDate: Date
     endDate: Date
     river: string
+    slack_member_id: string | null
 }
 
 export default function Alerts() {
@@ -31,6 +32,8 @@ export default function Alerts() {
 
     const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
     const [alertDateRanges, setAlertDateRanges] = useAtom(userAlerts_s)
+    const [slackAlertToggle, setSlackAlertToggle] = useState<boolean>(false)
+    const [slackAlertMemberId, setSlackAlertMemberId] = useState<string | null>(null)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -56,7 +59,8 @@ export default function Alerts() {
                 const selectedAlerts = selectedRivers.flatMap((r) => ({
                     startDate: startDate.toISOString().split('T')[0],
                     endDate: endDate.toISOString().split('T')[0],
-                    river: r
+                    river: r,
+                    slack_member_id: slackAlertToggle ? slackAlertMemberId : null
                 }));
                 const newAlerts = _.differenceWith(selectedAlerts, alertDateRanges, _.isEqual)
                 if (alertDateRanges !== null) {
@@ -69,6 +73,7 @@ export default function Alerts() {
                             end_date: alertDateRange.endDate,
                             river: alertDateRange.river,
                             user_id: currentUser?.id,
+                            slack_member_id: alertDateRange.slack_member_id
                         })
                 }
             }
@@ -95,7 +100,7 @@ export default function Alerts() {
 
     return (
         <Center>
-            <Container size={'xs'}>
+            <Container size={'lg'}>
                 <Title>Alert Selection</Title>
                 <Space my={'md'} />
                 <Text>Use the following date picker and river selector to setup alerts for specific rivers.</Text>
@@ -107,6 +112,20 @@ export default function Alerts() {
                         data={riverList}
                         placeholder="Select river(s)"
                     />
+                    <Group>
+                        <Switch
+                            checked={slackAlertToggle}
+                            onChange={(event) => setSlackAlertToggle(event.currentTarget.checked)}
+                            label={'Enable Slack Notification for Alert?'}
+                            description={<a target="_blank" rel="noopener noreferrer" href="https://www.workast.com/help/article/how-to-find-a-slack-user-id/">How to find Slack Member ID</a>}
+                        />
+                        <TextInput
+                            disabled={!slackAlertToggle}
+                            placeholder="Slack Member ID"
+                            value={slackAlertMemberId === null ? "" : slackAlertMemberId}
+                            onChange={(event) => setSlackAlertMemberId(event.currentTarget.value)}
+                        />
+                    </Group>
                     <DatePicker
                         type="range"
                         numberOfColumns={2}
@@ -129,6 +148,7 @@ export default function Alerts() {
                                 <Table.Th align='left'>River</Table.Th>
                                 <Table.Th align='left'>Alert Start Date</Table.Th>
                                 <Table.Th align='left'>Alert End Date</Table.Th>
+                                <Table.Th align='left'>Slack Alert Target</Table.Th>
                                 <Table.Th align='center'>Remove</Table.Th>
                             </Table.Tr>
                         </Table.Thead>
@@ -140,6 +160,7 @@ export default function Alerts() {
                                             <Table.Td align="left">{row.river}</Table.Td>
                                             <Table.Td align="left">{row.startDate.toString()}</Table.Td>
                                             <Table.Td align="left">{row.endDate.toString()}</Table.Td>
+                                            <Table.Td align="left">{row.slack_member_id}</Table.Td>
                                             <Table.Td align="center">
                                                 <ActionIcon color="red" variant="outline" onClick={() => removeRow(index)}>
                                                     <IconX />
