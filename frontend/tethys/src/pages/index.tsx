@@ -1,7 +1,6 @@
-import { AppShell, Navbar, Header, Text, Stack, Title, Container, Divider, Space, NavLink, UnstyledButton, Group } from '@mantine/core';
-import { NavbarButton } from './components/navbarButton';
+import { AppShell, ScrollArea, Text, Stack, Title, Container, Divider, Space, NavLink, UnstyledButton, Group, Box } from '@mantine/core';
 import { IconAlarm, IconDatabase, IconHelpCircle, IconMap, IconUser } from '@tabler/icons-react';
-import { activeTab_s, currentUser_s } from './state';
+import { activeTab_s, currentUser_s } from '../state';
 import About from './about';
 import { useEffect, useRef, useState } from 'react';
 import Alerts from './alerts';
@@ -10,9 +9,11 @@ import DataContainer from './data';
 import dynamic from "next/dynamic"
 import { useDisclosure } from '@mantine/hooks';
 import { useAtom } from 'jotai';
-import RiverMap from './riverMap';
+import { River } from './riverMap';
+import { fetchRiversData } from '@/api/supabase';
 import { supabase_s } from "./_app"
-import { riverList_s } from "./state"
+import { riverList_s } from "../state"
+import NavbarButton from './components/navbarButton';
 
 const MapWithNoSSR = dynamic(() => import('./riverMap'), {
   ssr: false,
@@ -21,29 +22,56 @@ const MapWithNoSSR = dynamic(() => import('./riverMap'), {
 export default function App() {
 
   const [currentUser, setCurrentUser] = useAtom(currentUser_s)
-  const [activeTab, setActiveTab] = useState(<MapWithNoSSR />)
+  const [activeTab, setActiveTab] = useAtom(activeTab_s)
   const [loginModalOpen, { open, close }] = useDisclosure(false)
   const [supabase, setSupabase] = useAtom(supabase_s)
   const [riverList, setRiverList] = useAtom(riverList_s)
+  const [selectedButton, setSelectedButton] = useState<string>('River Map');
+
 
   const buttons = [
-    <NavbarButton name={'River Map'} icon={<IconMap />} tab={<MapWithNoSSR />} setActiveTab={setActiveTab} />,
-    <NavbarButton name={'Data'} icon={<IconDatabase />} tab={<DataContainer />} setActiveTab={setActiveTab} />,
-    <NavbarButton name={'Alerts'} icon={<IconAlarm />} tab={<Alerts />} setActiveTab={setActiveTab} />,
-    <NavbarButton name={'About'} icon={<IconHelpCircle />} tab={<About />} setActiveTab={setActiveTab} />,
+    <NavbarButton
+      name={'River Map'}
+      icon={<IconMap />}
+      tab={<MapWithNoSSR />}
+      onSelect={setSelectedButton}
+      isSelected={selectedButton === 'River Map'}
+      key={'river_map'}
+    />,
+    <NavbarButton
+      name={'Data'}
+      icon={<IconDatabase />}
+      tab={<DataContainer />}
+      onSelect={setSelectedButton}
+      isSelected={selectedButton === 'Data'}
+      key={'data'}
+    />,
+    <NavbarButton
+      name={'Alerts'}
+      icon={<IconAlarm />}
+      tab={<Alerts />}
+      onSelect={setSelectedButton}
+      isSelected={selectedButton === 'Alerts'}
+      key={'alerts'}
+    />,
+    <NavbarButton
+      name={'About'}
+      icon={<IconHelpCircle />}
+      tab={<About />}
+      onSelect={setSelectedButton}
+      isSelected={selectedButton === 'About'}
+      key={'about'}
+    />,
   ]
 
   useEffect(() => {
-    const fetchMapData = async () => {
-      await supabase.from('rivers').select().then((data) => {
-        if (data.data) {
-          console.log('rivers data', data.data)
-          setRiverList(data.data)
-        }
+    const fetchData = async () => {
+      await fetchRiversData(supabase).then((rivers: River[]) => {
+        setRiverList(rivers)
       })
     }
+    fetchData();
 
-    fetchMapData()
   }, [])
 
 
@@ -52,43 +80,47 @@ export default function App() {
 
       <AppShell
         padding="md"
-        navbar={
-          <Navbar width={{ base: 300 }} height={'100vh'} p="xs">
-            <Navbar.Section>
-              <Title onClick={() => setActiveTab(<About />)} sx={{ cursor: 'pointer' }}>
-                🦦 Tethys
-              </Title>
-            </Navbar.Section>
-
-            <Space h="md" />
-            <Divider />
-
-            <Navbar.Section grow mt="md">
-              <Stack>
-                {...buttons}
-              </Stack>
-            </Navbar.Section>
-
-            <Divider />
-            <Space h="md" />
-
-            <Navbar.Section>
-              <UnstyledButton onClick={open}>
-                <Group >
-                  <IconUser />
-                  <div>
-                    <Text>{currentUser === null ? 'Account' : currentUser.email}</Text>
-                  </div>
-                </Group>
-              </UnstyledButton>
-              <Account opened={loginModalOpen} close={close} />
-            </Navbar.Section>
-          </Navbar>}
-        styles={(theme) => ({
-          main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] },
-        })}
+        withBorder={false}
+        navbar={{
+          width: 300,
+          breakpoint: 'sm',
+          collapsed: { mobile: !loginModalOpen },
+        }}
+        zIndex={0}
       >
-        {activeTab}
+        <AppShell.Navbar >
+          <AppShell.Section p={10}>
+            <Title onClick={() => setActiveTab(<About />)} style={{ cursor: 'pointer' }}>
+              🦦 Tethys
+            </Title>
+          </AppShell.Section>
+          <Divider />
+
+          <AppShell.Section grow component={ScrollArea}>
+            <Stack p={10}>
+              {...buttons}
+            </Stack>
+          </AppShell.Section>
+
+          <Divider />
+          <Space h="md" />
+
+          <AppShell.Section p={10} w={'100%'}>
+            <Stack>
+              <NavbarButton
+                name={currentUser === null ? 'Account' : currentUser.email}
+                icon={<IconUser />}
+                tab={<Account />}
+                onSelect={setSelectedButton}
+                isSelected={selectedButton === 'Account' || selectedButton === currentUser?.email}
+                key={'account'}
+              />
+            </Stack>
+          </AppShell.Section>
+        </AppShell.Navbar>
+        <AppShell.Main>
+          {activeTab}
+        </AppShell.Main>
       </AppShell>
     </>
   );
