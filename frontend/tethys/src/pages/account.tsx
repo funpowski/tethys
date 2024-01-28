@@ -1,12 +1,10 @@
 import { Text, Center, Container, Title, Modal, Tabs, TextInput, Checkbox, Group, Button, PasswordInput, Box, Space, rem } from "@mantine/core"
-import { Form, useForm } from "@mantine/form"
+import { useForm } from "@mantine/form"
 import { IconUser, IconUserPlus } from "@tabler/icons-react"
 import { useAtom } from "jotai"
-import { useState } from "react"
 import { supabase_s } from "./_app"
-import { authenticated_s, currentUser_s } from "./state"
-import { SupabaseUser } from "./state"
-import { error } from "console"
+import { authenticated_s, currentUser_s } from "../state"
+import { SupabaseUser } from "../state"
 
 export default function Account() {
 

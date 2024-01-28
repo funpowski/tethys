@@ -1,22 +1,34 @@
 import { Text, Box, Title, Drawer, Paper, List, Divider, Space, Container, Center, ActionIconGroup, Indicator, Popover, Stack, Group, LoadingOverlay } from "@mantine/core";
 import dayjs, { Dayjs } from 'dayjs';
-import { MapContainer, TileLayer, Tooltip } from "react-leaflet";
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useState } from "react";
-import type { GeoJSON as GeoJSONType } from "leaflet";
 import { useAtom } from "jotai";
 import { supabase_s } from "./_app";
-import { activeRiver_s, userAlerts_s, currentUser_s } from "./state";
-import { GeoJSON } from "react-leaflet";
-import { riverList_s } from "./state"
+import { activeRiver_s, userAlerts_s, currentUser_s } from "../state";
+import { riverList_s } from "../state"
 import { Calendar, DatePicker, DatePickerProps } from '@mantine/dates';
 import { fetchAlertDatesByUser, fetchCurrentStatus } from "@/api/supabase";
 import { AlertDateRange } from "./alerts";
 import AvailabilityRange from "./components/calendarColorBoxes";
+import dynamic from 'next/dynamic';
+
+// dynamically import all the leaflet stuff since `window` isn't available during server side rendering; only on the client 
+const MapContainer = dynamic(() => import('react-leaflet').then((module) => module.MapContainer), {
+    ssr: false,
+});
+const TileLayer = dynamic(() => import('react-leaflet').then((module) => module.TileLayer), {
+    ssr: false,
+});
+const Tooltip = dynamic(() => import('react-leaflet').then((module) => module.Tooltip), {
+    ssr: false,
+});
+const GeoJSON = dynamic(() => import('react-leaflet').then((module) => module.GeoJSON), {
+    ssr: false,
+});
 
 export interface River {
     name: string
-    geometry: GeoJSONType
+    geometry: any
     display_name: string
     permit_id: number
     division_id: number

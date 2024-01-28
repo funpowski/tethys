@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import { supabase_s } from "./_app";
-import { activeRiver_s, riverList_s } from "./state";
+import { activeRiver_s, riverList_s } from "../state";
 import { Box, Button, Center, Collapse, Container, Divider, Group, MultiSelect, ScrollArea, Space, Stack, Text, Title } from "@mantine/core";
 import { Table } from "@mantine/core";
 import { useEffect, useState } from "react";

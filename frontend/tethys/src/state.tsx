@@ -1,9 +1,9 @@
 import { atom } from 'jotai'
 import dynamic from "next/dynamic"
 import React, { useState } from "react";
-import { River } from './riverMap';
-import { AlertDateRange } from './alerts';
-const MapWithNoSSR = dynamic(() => import('./riverMap'), {
+import { River } from './pages/riverMap';
+import { AlertDateRange } from './pages/alerts';
+const MapWithNoSSR = dynamic(() => import('./pages/riverMap'), {
     ssr: false,
 });
 

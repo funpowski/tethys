@@ -1,7 +1,6 @@
 import { AppShell, ScrollArea, Text, Stack, Title, Container, Divider, Space, NavLink, UnstyledButton, Group, Box } from '@mantine/core';
-import { NavbarButton } from './components/navbarButton';
 import { IconAlarm, IconDatabase, IconHelpCircle, IconMap, IconUser } from '@tabler/icons-react';
-import { activeTab_s, currentUser_s } from './state';
+import { activeTab_s, currentUser_s } from '../state';
 import About from './about';
 import { useEffect, useRef, useState } from 'react';
 import Alerts from './alerts';
@@ -13,7 +12,8 @@ import { useAtom } from 'jotai';
 import { River } from './riverMap';
 import { fetchRiversData } from '@/api/supabase';
 import { supabase_s } from "./_app"
-import { riverList_s } from "./state"
+import { riverList_s } from "../state"
+import NavbarButton from './components/navbarButton';
 
 const MapWithNoSSR = dynamic(() => import('./riverMap'), {
   ssr: false,

@@ -1,7 +1,7 @@
 import { Avatar, Container, Group, Text, UnstyledButton } from "@mantine/core";
 import type { Icon } from "@tabler/icons-react";
 import React, { useState } from "react";
-import { activeTab_s } from "../state";
+import { activeTab_s } from "../../state";
 import { useAtom } from "jotai";
 
 interface NavbarButtonInterface {
@@ -14,7 +14,7 @@ interface NavbarButtonInterface {
 }
 
 
-export function NavbarButton({ name, icon, tab, onSelect, isSelected }: NavbarButtonInterface) {
+export default function NavbarButton({ name, icon, tab, onSelect, isSelected }: NavbarButtonInterface) {
     const [isHovered, setIsHovered] = useState(false);
     const [activeTab, setActiveTab] = useAtom(activeTab_s)
     const [isActive, setIsActive] = useState(false);

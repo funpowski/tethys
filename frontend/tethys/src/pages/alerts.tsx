@@ -2,10 +2,9 @@ import { Title, Center, Container, Text, Stack, Group, Button, Divider, Table, A
 import { DatePicker } from "@mantine/dates";
 import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import type { GeoJSON as GeoJSONType } from "leaflet";
 import { supabase_s } from "./_app";
 import { useAtom } from "jotai";
-import { authenticated_s, currentUser_s, userAlerts_s } from "./state";
+import { authenticated_s, currentUser_s, userAlerts_s } from "../state";
 var _ = require('lodash');
 import { fetchAlertDatesByUser, fetchRiversData } from "@/api/supabase";
 import { River } from "./riverMap";
