@@ -103,7 +103,7 @@ def alert_transitions(
     data = []
     for permit in river_response.data:
         permit_response = (
-            supabase.table("current_status_c")
+            supabase.table("current_status_v")
             .select("*")
             .eq("permit_name", permit["name"])
             .execute()
