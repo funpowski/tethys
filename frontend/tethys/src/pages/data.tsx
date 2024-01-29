@@ -1,12 +1,12 @@
 import { useAtom } from "jotai";
 import { supabase_s } from "./_app";
 import { activeRiver_s, riverList_s } from "../state";
-import { Box, Button, Center, Collapse, Container, Divider, Group, MultiSelect, ScrollArea, Space, Stack, Text, Title } from "@mantine/core";
+import { Box, Button, Center, Collapse, Container, Divider, Group, MultiSelect, ScrollArea, Space, Stack, TableCaption, Text, Title, em } from "@mantine/core";
 import { Table } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { fetchTransitionData } from "@/api/supabase";
 import { DatePicker, DatePickerInput } from "@mantine/dates";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 
 export interface Transition {
     permit_name: string
@@ -26,6 +26,7 @@ export default function DataContainer() {
     const [transitionTypeFilter, setTransitionTypeFilter] = useState<string[]>([]);
     const [permitDateFilter, setPermitDateFilter] = useState<[Date | null, Date | null]>([null, null]);
     const [filtersOpened, { toggle }] = useDisclosure(false);
+    const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
 
     const loadMoreData = async () => {
         const minScrapeTimestamp = transitions.reduce((prev, curr) => prev.scrape_timestamp < curr.scrape_timestamp ? prev : curr).scrape_timestamp;
@@ -73,16 +74,25 @@ export default function DataContainer() {
     return (
         <>
             <Center>
-                <Box style={{ 'width': '70vw' }}>
+                <Box style={{ 'width': '100%' }}>
                     <Stack>
-                        <Group justify="space-between">
-                            <Title>Data Viewer</Title>
-                            <Button variant="outline" onClick={toggle}>{filtersOpened ? 'Hide' : 'Display'} Filters</Button>
-                        </Group>
+                        {!isMobile && <Title>Data Viewer</Title>}
+                        <Box>
+                            <Group>
+                                <Button variant="outline" onClick={toggle}>{filtersOpened ? 'Hide' : 'Display'} Filters</Button>
+                                <Button
+                                    color="blue"
+                                    onClick={loadMoreData}
+                                    variant="outline"
+                                >
+                                    Load More Data
+                                </Button>
+                            </Group>
+                        </Box>
                         <Collapse in={filtersOpened}>
                             <Divider />
-                            <Group justify="space-between" p={'20px'} grow>
-                                <Box style={{ width: '50%' }}>
+                            <Group justify="space-between" p={'20px'} ml={'xl'} mr={'xl'} >
+                                <Box style={{ width: isMobile ? '100%' : '50%' }}>
                                     <Text fw={500}>Filter table based on date range, permit name, and permit transition type.</Text>
                                     <Space h={'lg'} />
                                     <MultiSelect
@@ -145,17 +155,10 @@ export default function DataContainer() {
                                         </Table.Tr>
                                     ))}
                                 </Table.Tbody>
-                                <Table.Caption>
-                                    <Button
-                                        color="blue"
-                                        onClick={loadMoreData}
-                                        variant="outline"
-                                    >
-                                        Load More Data
-                                    </Button>
-                                </Table.Caption>
                             </Table>
                         </ScrollArea>
+                        <Center>
+                        </Center>
                     </Stack>
                 </Box>
             </Center >

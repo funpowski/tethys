@@ -171,7 +171,7 @@ const Sidebar = ({ isOpen, onOpen, onClose }) => {
             <Drawer
                 withOverlay={false}
                 closeOnClickOutside={false}
-                zIndex={999}
+                zIndex={99999}
                 styles={{ root: { width: 0, height: 0 } }}
                 opened={isOpen}
                 onClose={onClose}
@@ -289,33 +289,37 @@ export default function RiverMap() {
 
     return (
         <>
-            <Box style={{ height: 'calc(100vh - 35px)' }} >
-                <Sidebar isOpen={isSidebarOpen} onOpen={openSidebar} onClose={closeSidebar} />
-                <MapContainer center={[39.86883571107782, -107.73610748111314]} style={{ height: "100%", width: "100%" }
-                } zoom={5} >
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    {
-                        riverList?.map((river) => {
-                            return <GeoJSON
-                                key={river.name}
-                                data={JSON.parse(river?.geometry as any)}
-                                onEachFeature={(feature, leafletLayer) => {
-                                    leafletLayer.on("click", (event) => {
-                                        openSidebar();
-                                        setActiveRiver(river)
-                                    });
+            <Sidebar isOpen={isSidebarOpen} onOpen={openSidebar} onClose={closeSidebar} />
+            <MapContainer
+                center={[39.86883571107782, -107.73610748111314]}
+                zoom={5}
+                style={{
+                    height: '100%',
+                    width: '100%',
+                }}
+            >
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {
+                    riverList?.map((river) => {
+                        return <GeoJSON
+                            key={river.name}
+                            data={JSON.parse(river?.geometry as any)}
+                            onEachFeature={(feature, leafletLayer) => {
+                                leafletLayer.on("click", (event) => {
+                                    openSidebar();
+                                    setActiveRiver(river)
+                                });
 
-                                }}
-                            >
-                                <Tooltip>{river.display_name}</Tooltip>
-                            </GeoJSON>
-                        })
-                    }
-                </MapContainer >
-            </Box>
+                            }}
+                        >
+                            <Tooltip>{river.display_name}</Tooltip>
+                        </GeoJSON>
+                    })
+                }
+            </MapContainer >
         </>
     )
 }

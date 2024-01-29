@@ -1,6 +1,6 @@
 import "@mantine/core/styles.css";
 import Head from "next/head";
-import { MantineProvider } from "@mantine/core";
+import { MantineProvider, em } from "@mantine/core";
 import { theme } from "../theme";
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { atom, useAtom } from 'jotai';
@@ -20,6 +20,8 @@ if (process.env.NEXT_PUBLIC_SUPABASE_URL !== undefined && process.env.NEXT_PUBLI
 export const supabase_s = atom(supabaseClient);
 
 export default function App({ Component, pageProps }: any) {
+
+
   return (
     <MantineProvider theme={theme}>
       <Notifications />

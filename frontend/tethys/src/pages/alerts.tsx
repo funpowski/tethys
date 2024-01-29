@@ -1,4 +1,4 @@
-import { Title, Center, Container, Text, Stack, Group, Button, Divider, Table, ActionIcon, MultiSelect, Code, Space, Checkbox, Switch, TextInput } from "@mantine/core";
+import { Title, Center, Container, Text, Stack, Group, Button, Divider, Table, ActionIcon, MultiSelect, Code, Space, Checkbox, Switch, TextInput, em, ScrollArea, Box } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { authenticated_s, currentUser_s, userAlerts_s } from "../state";
 var _ = require('lodash');
 import { fetchAlertDatesByUser, fetchRiversData } from "@/api/supabase";
 import { River } from "./riverMap";
+import { useMediaQuery } from "@mantine/hooks";
 
 export interface AlertDateRange {
     startDate: Date
@@ -34,6 +35,7 @@ export default function Alerts() {
     const [alertDateRanges, setAlertDateRanges] = useAtom(userAlerts_s)
     const [slackAlertToggle, setSlackAlertToggle] = useState<boolean>(false)
     const [slackAlertMemberId, setSlackAlertMemberId] = useState<string | null>(null)
+    const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -97,11 +99,46 @@ export default function Alerts() {
 
     };
 
+    function generateTable() {
+        return (
+            <Table highlightOnHover stickyHeader >
+                <Table.Thead>
+                    <Table.Tr>
+                        <Table.Th align='left'>River</Table.Th>
+                        <Table.Th align='left'>Alert Start Date</Table.Th>
+                        <Table.Th align='left'>Alert End Date</Table.Th>
+                        <Table.Th align='left'>Slack Alert Target</Table.Th>
+                        <Table.Th align='center'>Remove</Table.Th>
+                    </Table.Tr>
+                </Table.Thead>
+                {
+                    currentUser !== null ?
+                        <Table.Tbody>
+                            {alertDateRanges?.map((row, index) => (
+                                <Table.Tr key={index}>
+                                    <Table.Td align="left">{row.river}</Table.Td>
+                                    <Table.Td align="left">{row.startDate.toString()}</Table.Td>
+                                    <Table.Td align="left">{row.endDate.toString()}</Table.Td>
+                                    <Table.Td align="left">{row.slack_member_id}</Table.Td>
+                                    <Table.Td align="center">
+                                        <ActionIcon color="red" variant="outline" onClick={() => removeRow(index)}>
+                                            <IconX />
+                                        </ActionIcon>
+                                    </Table.Td>
+                                </Table.Tr>
+                            ))}
+                        </Table.Tbody>
+                        :
+                        <Table.Caption>Please login to see alerts</Table.Caption>
+                }
+            </Table>
+        )
+    }
 
     return (
         <Center>
             <Container size={'lg'}>
-                <Title>Alert Selection</Title>
+                {!isMobile && <Title>Alerts</Title>}
                 <Space my={'md'} />
                 <Text>Use the following date picker and river selector to setup alerts for specific rivers.</Text>
                 <Space my={'md'} />
@@ -128,7 +165,7 @@ export default function Alerts() {
                     </Group>
                     <DatePicker
                         type="range"
-                        numberOfColumns={2}
+                        numberOfColumns={isMobile ? 1 : 2}
                         value={dateRange}
                         onChange={setDateRange}
                     />
@@ -141,40 +178,15 @@ export default function Alerts() {
                         <Title order={3}>Selected Alerts</Title>
                         <Code>{currentUser !== null ? currentUser?.email : null}</Code>
                     </Group>
-
-                    <Table highlightOnHover >
-                        <Table.Thead>
-                            <Table.Tr>
-                                <Table.Th align='left'>River</Table.Th>
-                                <Table.Th align='left'>Alert Start Date</Table.Th>
-                                <Table.Th align='left'>Alert End Date</Table.Th>
-                                <Table.Th align='left'>Slack Alert Target</Table.Th>
-                                <Table.Th align='center'>Remove</Table.Th>
-                            </Table.Tr>
-                        </Table.Thead>
-                        {
-                            currentUser !== null ?
-                                <Table.Tbody>
-                                    {alertDateRanges?.map((row, index) => (
-                                        <Table.Tr key={index}>
-                                            <Table.Td align="left">{row.river}</Table.Td>
-                                            <Table.Td align="left">{row.startDate.toString()}</Table.Td>
-                                            <Table.Td align="left">{row.endDate.toString()}</Table.Td>
-                                            <Table.Td align="left">{row.slack_member_id}</Table.Td>
-                                            <Table.Td align="center">
-                                                <ActionIcon color="red" variant="outline" onClick={() => removeRow(index)}>
-                                                    <IconX />
-                                                </ActionIcon>
-                                            </Table.Td>
-                                        </Table.Tr>
-                                    ))}
-                                </Table.Tbody>
-                                :
-                                <Table.Caption>Please login to see alerts</Table.Caption>
-                        }
-                    </Table>
+                    {isMobile ?
+                        <ScrollArea w={'80vw'} >
+                            {generateTable()}
+                        </ScrollArea>
+                        :
+                        generateTable()
+                    }
                 </Stack>
             </Container>
-        </Center>
+        </Center >
     )
 }

@@ -1,4 +1,4 @@
-import { AppShell, ScrollArea, Text, Stack, Title, Container, Divider, Space, NavLink, UnstyledButton, Group, Box } from '@mantine/core';
+import { AppShell, ScrollArea, Text, Stack, Title, Container, Divider, Space, NavLink, UnstyledButton, Group, Box, em } from '@mantine/core';
 import { IconAlarm, IconDatabase, IconHelpCircle, IconMap, IconUser } from '@tabler/icons-react';
 import { activeTab_s, currentUser_s } from '../state';
 import About from './about';
@@ -7,13 +7,14 @@ import Alerts from './alerts';
 import Account from './account';
 import DataContainer from './data';
 import dynamic from "next/dynamic"
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { useAtom } from 'jotai';
 import { River } from './riverMap';
 import { fetchRiversData } from '@/api/supabase';
 import { supabase_s } from "./_app"
 import { riverList_s } from "../state"
 import NavbarButton from './components/navbarButton';
+import AppTitleBar from './components/menuTitle';
 
 const MapWithNoSSR = dynamic(() => import('./riverMap'), {
   ssr: false,
@@ -23,10 +24,11 @@ export default function App() {
 
   const [currentUser, setCurrentUser] = useAtom(currentUser_s)
   const [activeTab, setActiveTab] = useAtom(activeTab_s)
-  const [loginModalOpen, { open, close }] = useDisclosure(false)
+  const [mobileSidebarOpen, { toggle }] = useDisclosure(false)
   const [supabase, setSupabase] = useAtom(supabase_s)
   const [riverList, setRiverList] = useAtom(riverList_s)
   const [selectedButton, setSelectedButton] = useState<string>('River Map');
+  const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
 
 
   const buttons = [
@@ -37,6 +39,7 @@ export default function App() {
       onSelect={setSelectedButton}
       isSelected={selectedButton === 'River Map'}
       key={'river_map'}
+      sidebarToggle={toggle}
     />,
     <NavbarButton
       name={'Data'}
@@ -45,6 +48,7 @@ export default function App() {
       onSelect={setSelectedButton}
       isSelected={selectedButton === 'Data'}
       key={'data'}
+      sidebarToggle={toggle}
     />,
     <NavbarButton
       name={'Alerts'}
@@ -53,6 +57,7 @@ export default function App() {
       onSelect={setSelectedButton}
       isSelected={selectedButton === 'Alerts'}
       key={'alerts'}
+      sidebarToggle={toggle}
     />,
     <NavbarButton
       name={'About'}
@@ -61,6 +66,7 @@ export default function App() {
       onSelect={setSelectedButton}
       isSelected={selectedButton === 'About'}
       key={'about'}
+      sidebarToggle={toggle}
     />,
   ]
 
@@ -74,25 +80,25 @@ export default function App() {
 
   }, [])
 
-
   return (
     <>
-
       <AppShell
-        padding="md"
+        transitionDuration={0}
+        padding={0}
         withBorder={false}
         navbar={{
           width: 300,
           breakpoint: 'sm',
-          collapsed: { mobile: !loginModalOpen },
+          collapsed: { mobile: !mobileSidebarOpen },
         }}
         zIndex={0}
       >
-        <AppShell.Navbar >
-          <AppShell.Section p={10}>
-            <Title onClick={() => setActiveTab(<About />)} style={{ cursor: 'pointer' }}>
-              🦦 Tethys
-            </Title>
+        <AppShell.Navbar zIndex={9999} >
+          <AppShell.Section>
+            <AppTitleBar
+              mobileSidebarOpen={mobileSidebarOpen}
+              toggle={toggle}
+            />
           </AppShell.Section>
           <Divider />
 
@@ -105,8 +111,8 @@ export default function App() {
           <Divider />
           <Space h="md" />
 
-          <AppShell.Section p={10} w={'100%'}>
-            <Stack>
+          <AppShell.Section w={'100%'}>
+            <Stack p={10}>
               <NavbarButton
                 name={currentUser === null ? 'Account' : currentUser.email}
                 icon={<IconUser />}
@@ -114,12 +120,30 @@ export default function App() {
                 onSelect={setSelectedButton}
                 isSelected={selectedButton === 'Account' || selectedButton === currentUser?.email}
                 key={'account'}
+                sidebarToggle={toggle}
               />
             </Stack>
           </AppShell.Section>
         </AppShell.Navbar>
-        <AppShell.Main>
-          {activeTab}
+        <AppShell.Main >
+          {
+            isMobile && !mobileSidebarOpen &&
+            <>
+              <AppTitleBar
+                mobileSidebarOpen={mobileSidebarOpen}
+                toggle={toggle}
+              />
+              <Divider />
+            </>
+          }
+          <Box
+            p={10}
+            style={{
+              height: isMobile ? "90vh" : '100vh',
+            }}
+          >
+            {activeTab}
+          </Box>
         </AppShell.Main>
       </AppShell>
     </>

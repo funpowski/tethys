@@ -1,4 +1,4 @@
-import { Text, Center, Container, Title, Modal, Tabs, TextInput, Checkbox, Group, Button, PasswordInput, Box, Space, rem } from "@mantine/core"
+import { Text, Center, Container, Title, Modal, Tabs, TextInput, Checkbox, Group, Button, PasswordInput, Box, Space, rem, em } from "@mantine/core"
 import { useForm } from "@mantine/form"
 import { IconUser, IconUserPlus } from "@tabler/icons-react"
 import { useAtom } from "jotai"
@@ -6,6 +6,7 @@ import { supabase_s } from "./_app"
 import { authenticated_s, currentUser_s } from "../state"
 import { SupabaseUser } from "../state"
 import { notifications } from '@mantine/notifications';
+import { useMediaQuery } from "@mantine/hooks"
 
 export default function Account() {
 
@@ -60,15 +61,17 @@ export default function Account() {
     });
 
     const iconStyle = { width: rem(15), height: rem(15) };
+    const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
+
 
     return (
         <Center>
             <Container size={'xs'}>
                 <Box style={{
-                    width: '30vw'
+                    width: isMobile ? '90vw' : '30vw'
                 }}>
 
-                    <Title>Account</Title>
+                    {!isMobile && <Title>Account</Title>}
                     <Space my={'md'} />
                     {authenticated === false ?
                         <Tabs defaultValue="login">

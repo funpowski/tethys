@@ -3,6 +3,7 @@ import dynamic from "next/dynamic"
 import React, { useState } from "react";
 import { River } from './pages/riverMap';
 import { AlertDateRange } from './pages/alerts';
+import About from './pages/about';
 const MapWithNoSSR = dynamic(() => import('./pages/riverMap'), {
     ssr: false,
 });
@@ -14,8 +15,8 @@ export interface SupabaseUser {
     refresh_token: string
     expires_in: number
 }
-
 export const activeTab_s = atom<React.ReactNode>(<MapWithNoSSR />)
+export const activeTabName_s = atom<string>('River Map')
 export const currentUser_s = atom<SupabaseUser | null>(null)
 export const authenticated_s = atom<boolean>(false)
 export const activeRiver_s = atom<River | null>(null)
