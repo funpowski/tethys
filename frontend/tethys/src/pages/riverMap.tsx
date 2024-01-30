@@ -1,4 +1,4 @@
-import { Text, Box, Title, Drawer, Paper, List, Divider, Space, Container, Center, ActionIconGroup, Indicator, Popover, Stack, Group, LoadingOverlay } from "@mantine/core";
+import { Text, Box, Title, Drawer, Paper, List, Divider, Space, Container, Center, ActionIconGroup, Indicator, Popover, Stack, Group, LoadingOverlay, em } from "@mantine/core";
 import dayjs, { Dayjs } from 'dayjs';
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useState } from "react";
@@ -11,6 +11,7 @@ import { fetchAlertDatesByUser, fetchCurrentStatus } from "@/api/supabase";
 import { AlertDateRange } from "./alerts";
 import AvailabilityRange from "./components/calendarColorBoxes";
 import dynamic from 'next/dynamic';
+import { useMediaQuery } from "@mantine/hooks";
 
 // dynamically import all the leaflet stuff since `window` isn't available during server side rendering; only on the client 
 const MapContainer = dynamic(() => import('react-leaflet').then((module) => module.MapContainer), {
@@ -211,9 +212,9 @@ const Sidebar = ({ isOpen, onOpen, onClose }) => {
                                 }
                             </List>
                             :
-                            <Text>No alerts set for this river.</Text>
+                            <Text fs={'italic'}>No alerts set for this river.</Text>
                         :
-                        <Text>Please login to display current alerts for this river.</Text>
+                        <Text fs={'italic'}>Please login to display current alerts for this river.</Text>
                     }
                     <Divider my="md" />
                     <Title order={4}>Current Availability:</Title>
@@ -277,6 +278,7 @@ export default function RiverMap() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [activeRiver, setActiveRiver] = useAtom(activeRiver_s)
     const [riverList, setRiverList] = useAtom(riverList_s)
+    const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
 
     const openSidebar = () => {
         setIsSidebarOpen(true);
@@ -307,11 +309,32 @@ export default function RiverMap() {
                         return <GeoJSON
                             key={river.name}
                             data={JSON.parse(river?.geometry as any)}
+                            pathOptions={{
+                            }}
                             onEachFeature={(feature, leafletLayer) => {
+                                console.log('feature', feature)
+                                console.log('leafletLayer', leafletLayer)
                                 leafletLayer.on("click", (event) => {
                                     openSidebar();
                                     setActiveRiver(river)
                                 });
+                                leafletLayer.on('mouseover', (event) => {
+                                    var layer = event.target;
+                                    layer.setStyle({
+                                        stroke: true,
+                                        weight: 7,
+                                        dashArray: '',
+                                        opacity: 0.7,
+                                    });
+                                })
+                                leafletLayer.on('mouseout', (event) => {
+                                    var layer = event.target;
+                                    layer.setStyle({
+                                        weight: 3,
+                                        dashArray: '',
+                                        opacity: 1
+                                    });
+                                })
 
                             }}
                         >

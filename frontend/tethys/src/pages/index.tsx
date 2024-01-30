@@ -140,6 +140,7 @@ export default function App() {
             p={10}
             style={{
               height: isMobile ? "90vh" : '100vh',
+              maxHeight: isMobile ? '-webkit-fill-available' : '100vh'
             }}
           >
             {activeTab}
