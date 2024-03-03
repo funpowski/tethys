@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 import requests
+import json
 from typing import Literal, List, Dict, Any
 import random
 import pandas as pd
@@ -13,7 +14,6 @@ class SlackRiverAlert(BaseModel):
     scrape_timestamp: str
     transition_type: Literal["no_change", "permit_claimed", "permit_released"]
     url: str
-    slack_member_ids: List[str]
 
     def _prettify_transition_type(self, transition_type: str) -> str:
         pretty_dict = {
@@ -72,17 +72,6 @@ class SlackRiverAlert(BaseModel):
                         """,
                     },
                 },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "".join(
-                            f"<@{user_id}> " for user_id in self.slack_member_ids
-                        )
-                        if self.slack_member_ids
-                        else " ",
-                    },
-                },
             ]
         }
 
@@ -94,6 +83,23 @@ def detect_transition_type(previous_num_available, current_num_available):
         return "permit_released"
     else:
         return "no_change"
+
+
+def send_dm(user_id: str, slack_alert: SlackRiverAlert) -> None:
+    token = get_secret("tethys/tethys_alerts/slack_token")["token"]
+    response = requests.post(
+        "https://slack.com/api/chat.postMessage",
+        data={
+            "token": token,
+            "channel": user_id,
+            "blocks": json.dumps(slack_alert.generate_slack_payload()["blocks"]),
+        },
+    )
+    response_json = response.json()
+    if not response_json["ok"]:
+        raise requests.exceptions.HTTPError(
+            f'Error detected in response: {response_json["error"]}'
+        )
 
 
 def alert_transitions(
@@ -163,7 +169,11 @@ def alert_transitions(
                 scrape_timestamp=row.scrape_time,
                 transition_type=row.transition_type,
                 url=river_info.rec_gov_url,
-                slack_member_ids=alert_ids,
             )
 
+            # post to general transition channel
             response = requests.post(webhook_url, json=alert.generate_slack_payload())
+
+            # send dms as needed
+            for alert_id in alert_ids:
+                send_dm(alert_id, alert)
