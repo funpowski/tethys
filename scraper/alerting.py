@@ -175,5 +175,6 @@ def alert_transitions(
             response = requests.post(webhook_url, json=alert.generate_slack_payload())
 
             # send dms as needed
-            for alert_id in alert_ids:
-                send_dm(alert_id, alert)
+            if row.transition_type == "permit_released":
+                for alert_id in alert_ids:
+                    send_dm(alert_id, alert)
