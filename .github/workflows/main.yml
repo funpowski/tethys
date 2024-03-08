@@ -1,4 +1,4 @@
-name: tethys2
+name: tethys3
 on:
   push:
     branches:
